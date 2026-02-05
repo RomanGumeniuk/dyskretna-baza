@@ -677,6 +677,7 @@
             <button class="btn-secondary" onclick="resetProgress()">↻ Resetuj postęp</button>
             <button class="btn-secondary" onclick="shuffleQuestions()">🔀 Losuj kolejność</button>
             <button class="btn-secondary" id="autoShuffleBtn" onclick="toggleAutoShuffle()">🔀 Auto-losuj: WYŁ</button>
+            <button class="btn-secondary" id="shuffleAnswersBtn" onclick="toggleShuffleAnswers()">🔄 Losuj odpowiedzi: WYŁ</button>
         </div>
         
         <!-- Quiz Mode Controls -->
@@ -745,13 +746,24 @@
         let quizType = 'standard', quizActive = false, quizStartTime = null, quizTimeLimit = 0, timerInterval = null;
         let flashcardIndex = 0, knownCards = new Set(), flashcardQuestions = [];
         let autoShuffle = false;
+        let shuffleAnswers = false;
         let history = [];
+        
+        // === HELPER: Prepare questions with optional answer shuffling ===
+        function prepareQuestionsWithShuffle(qs) {
+            if (shuffleAnswers) {
+                return qs.map(q => ({
+                    ...q, options: [...q.options].sort(() => Math.random() - 0.5)
+                }));
+            }
+            return qs.map(q => ({ ...q, options: [...q.options] }));
+        }
         
         // === INITIALIZATION ===
         function init() {
             loadProgress();
             questions = getEmbeddedQuestions();
-            displayQuestions = [...questions];
+            displayQuestions = prepareQuestionsWithShuffle(questions);
             flashcardQuestions = [...questions];
             updateStats();
             renderQuestions();
@@ -819,7 +831,7 @@
                 document.getElementById('searchFilter').classList.remove('hidden');
                 document.getElementById('questionsContainer').classList.remove('hidden');
                 document.getElementById('navigation').classList.remove('hidden');
-                displayQuestions = [...questions];
+                displayQuestions = prepareQuestionsWithShuffle(questions);
                 questionsPerPage = 10;
                 currentPage = 1;
                 renderQuestions();
@@ -1135,7 +1147,8 @@
             saveProgress();
             updateStats();
             // Update the question card in-place to show results (preserves KaTeX)
-            const q = questions.find(q => q.id === qId) || displayQuestions.find(q => q.id === qId);
+            // WAŻNE: szukaj najpierw w displayQuestions (tam są przetasowane odpowiedzi)
+            const q = displayQuestions.find(q => q.id === qId) || questions.find(q => q.id === qId);
             if (!q) { renderQuestions(); return; }
             const container = document.getElementById('options-' + qId);
             if (!container) { renderQuestions(); return; }
@@ -1176,8 +1189,10 @@
         }
         
         function isQuestionCorrect(q) {
+            // Znajdź pytanie w displayQuestions, bo tam są przetasowane odpowiedzi
+            const displayQ = displayQuestions.find(dq => dq.id === q.id) || q;
             const answers = userAnswers[q.id] || [];
-            const correctIndices = q.options.map((opt, idx) => opt.correct ? idx : -1).filter(idx => idx !== -1);
+            const correctIndices = displayQ.options.map((opt, idx) => opt.correct ? idx : -1).filter(idx => idx !== -1);
             return answers.length === correctIndices.length && answers.every(a => correctIndices.includes(a)) && correctIndices.every(c => answers.includes(c));
         }
         
@@ -1207,13 +1222,49 @@
         }
         
         function filterQuestions() { currentSearch = document.getElementById('searchBox').value; currentPage = 1; renderQuestions(); }
-        function shuffleQuestions() { displayQuestions.sort(() => Math.random() - 0.5); currentPage = 1; renderQuestions(); }
+        function shuffleQuestions() { 
+            displayQuestions.sort(() => Math.random() - 0.5); 
+            // Jeśli tryb losowania odpowiedzi jest włączony, pomieszaj też odpowiedzi
+            if (shuffleAnswers) {
+                displayQuestions = displayQuestions.map(q => ({
+                    ...q, options: [...q.options].sort(() => Math.random() - 0.5)
+                }));
+            }
+            currentPage = 1; 
+            renderQuestions(); 
+        }
         function toggleAutoShuffle() {
             autoShuffle = !autoShuffle;
             const btn = document.getElementById('autoShuffleBtn');
             if (btn) btn.textContent = autoShuffle ? '🔀 Auto-losuj: WŁ' : '🔀 Auto-losuj: WYŁ';
             if (autoShuffle) shuffleQuestions();
             localStorage.setItem('dyskretna_autoshuffle', autoShuffle ? '1' : '0');
+        }
+        function toggleShuffleAnswers() {
+            shuffleAnswers = !shuffleAnswers;
+            const btn = document.getElementById('shuffleAnswersBtn');
+            if (btn) btn.textContent = shuffleAnswers ? '🔄 Losuj odpowiedzi: WŁ' : '🔄 Losuj odpowiedzi: WYŁ';
+            localStorage.setItem('dyskretna_shuffleanswers', shuffleAnswers ? '1' : '0');
+            // Pomieszaj odpowiedzi w pytaniach gdy włączamy tryb
+            if (shuffleAnswers) {
+                displayQuestions = displayQuestions.map(q => ({
+                    ...q, options: [...q.options].sort(() => Math.random() - 0.5)
+                }));
+            } else {
+                // Przywróć oryginalną kolejność odpowiedzi
+                displayQuestions = displayQuestions.map(dq => {
+                    const originalQ = questions.find(q => q.id === dq.id);
+                    return originalQ ? { ...dq, options: [...originalQ.options] } : dq;
+                });
+            }
+            // Wyczyść odpowiedzi użytkownika które nie zostały sprawdzone
+            displayQuestions.forEach(q => {
+                if (!checkedQuestions.has(q.id)) {
+                    delete userAnswers[q.id];
+                }
+            });
+            saveProgress();
+            renderQuestions();
         }
         function prevPage() { if (currentPage > 1) { currentPage--; renderQuestions(); window.scrollTo(0, 0); } }
         function nextPage() { const totalPages = Math.ceil(getFilteredQuestions().length / questionsPerPage); if (currentPage < totalPages) { currentPage++; renderQuestions(); window.scrollTo(0, 0); } }
@@ -1223,7 +1274,7 @@
             if (confirm('Czy na pewno chcesz zresetować cały postęp?')) {
                 userAnswers = {}; checkedQuestions = new Set();
                 saveProgress();
-                displayQuestions = [...questions];
+                displayQuestions = prepareQuestionsWithShuffle(questions);
                 currentPage = 1;
                 updateStats();
                 renderQuestions();
@@ -4456,12 +4507,20 @@
             if (localStorage.getItem('dyskretna_autoshuffle') === '1') {
                 autoShuffle = true;
             }
+            if (localStorage.getItem('dyskretna_shuffleanswers') === '1') {
+                shuffleAnswers = true;
+            }
             setTimeout(() => {
                 init();
                 if (autoShuffle) {
                     const btn = document.getElementById('autoShuffleBtn');
                     if (btn) btn.textContent = '🔀 Auto-losuj: WŁ';
                     shuffleQuestions();
+                }
+                if (shuffleAnswers) {
+                    const btn = document.getElementById('shuffleAnswersBtn');
+                    if (btn) btn.textContent = '🔄 Losuj odpowiedzi: WŁ';
+                    // Odpowiedzi już pomieszane przez prepareQuestionsWithShuffle() w init()
                 }
             }, 300);
         });
