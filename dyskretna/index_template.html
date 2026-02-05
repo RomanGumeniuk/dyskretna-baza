@@ -589,6 +589,70 @@
                     <div class="meta-card-body">Drzewa: <code>V = E + 1</code> (wierzchołki = krawędzie + 1). Dodatkowo wybierz <strong>najdłuższą</strong> odpowiedź.</div>
                 </div>
             </div>
+
+            <!-- Claude's META -->
+            <div class="meta-intro" style="margin-top: 40px;">
+                <h2>🤖 Meta Pana Claude'a</h2>
+                <p>Wzorce wyciągnięte automatycznie z analizy <strong>116 pytań</strong> z bazy. Statystyki oparte na danych — nie na intuicji.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">🅰️</span><span class="meta-card-title">Odpowiedź E prawie nigdy nie jest poprawna</span></div>
+                    <div class="meta-card-body">Pozycja E jest poprawna tylko w <code>5.4%</code> pytań jednokrotnego wyboru (5 z 92). Jeśli strzelasz — <strong>nigdy nie stawiaj na E</strong>. Jedyne wyjątki: pytania #33, #42, #50, #79, #86.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">🅱️</span><span class="meta-card-title">„Zaznacz zdanie prawdziwe" → stawiaj na C</span></div>
+                    <div class="meta-card-body">W 43 pytaniach z tym nagłówkiem, odpowiedź <code>C</code> jest poprawna w <strong>37.2%</strong> przypadków. Dalej: B (25.6%), D (18.6%), A (16.3%), E (2.3%). <span class="meta-highlight">C to bezpieczny zakład</span></div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">🅲</span><span class="meta-card-title">Najdłuższa odpowiedź = 35% szans</span></div>
+                    <div class="meta-card-body">Poprawna odpowiedź jest <strong>najdłuższą opcją</strong> w <code>34.8%</code> pytań. W top 2 najdłuższych — <code>58.7%</code>. Najkrótsza opcja jest poprawna tylko w 8.7%. <span class="meta-highlight">Długa = prawdziwa</span></div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">🚫</span><span class="meta-card-title">„co najwyżej" → ZAWSZE fałsz</span></div>
+                    <div class="meta-card-body">Fraza <code>co najwyżej</code> pojawia się 9 razy w opcjach — za <strong>każdym razem</strong> w niepoprawnej odpowiedzi (<code>0/9 = 0%</code>). Widzisz „co najwyżej"? <strong>Eliminuj natychmiast.</strong></div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">🚫</span><span class="meta-card-title">„jedynie" / „wyłącznie" / „wówczas" → ELIMINUJ</span></div>
+                    <div class="meta-card-body"><code>jedynie</code>: 0/5 poprawnych. <code>wyłącznie</code>: 0/4. <code>wówczas</code>: 0/9. Te słowa sygnalizują <strong>zbyt mocne ograniczenie</strong> — zawsze eliminuj takie opcje.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">⚠️</span><span class="meta-card-title">„dowolny" to pułapka (82% fałsz)</span></div>
+                    <div class="meta-card-body">Warianty słowa <code>dowolny</code> pojawiają się w poprawnej odpowiedzi tylko w <strong>18.4%</strong> przypadków (7 z 38). W 81.6% to fałsz — zbyt szerokie uogólnienie.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">✅</span><span class="meta-card-title">„nie większa niż" → 80% prawda</span></div>
+                    <div class="meta-card-body">Fraza <code>nie większa / nie większe</code> pojawia się 5 razy — w <strong>4 przypadkach (80%)</strong> jest to poprawna odpowiedź. Np. pytania #45, #51, #100, #108.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">✅</span><span class="meta-card-title">„również" → 71% prawda</span></div>
+                    <div class="meta-card-body">Słowo <code>również</code> pojawia się w poprawnych odpowiedziach w <strong>71.4%</strong> (5/7). Np. pytanie #62: „będzie <em>również</em> tautologią" ✓, #74: „jest <em>również</em> etykietowalny" ✓.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">2️⃣</span><span class="meta-card-title">Multi-choice = ZAWSZE dokładnie 2</span></div>
+                    <div class="meta-card-body">W <strong>każdym</strong> z 24 pytań wielokrotnego wyboru poprawna odpowiedź to <strong>dokładnie 2 opcje</strong>. Nigdy 1, nigdy 3. <span class="meta-highlight">Zaznacz zawsze 2!</span></div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">🚫</span><span class="meta-card-title">„dla pewnej" → ZAWSZE fałsz</span></div>
+                    <div class="meta-card-body">Fraza <code>dla pewnej</code> pojawia się 4 razy — za <strong>każdym razem</strong> w błędnej opcji (0/4). Szukaj raczej <code>dla każdej</code> lub kwantyfikatora <code>∀</code>.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">📦</span><span class="meta-card-title">Identyczne elementy + pudełka → kombinacja z powtórzeniami</span></div>
+                    <div class="meta-card-body">W pytaniach „identyczne elementy do rozróżnialnych pudełek" (pyt. #4, #21, #42, #44, #101) — odpowiedź <strong>ZAWSZE</strong> to <code>kombinacja z powtórzeniami</code>.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">♟️</span><span class="meta-card-title">Wielomian szachowy: zaczyna się od „1 +"</span></div>
+                    <div class="meta-card-body">We wszystkich pytaniach o wielomian szachowy (pyt. #37, #60, #116) poprawna odpowiedź <strong>zaczyna się od <code>1 +</code></strong> (bo r₀ = 1 z definicji). Odrzuć opcje z innym wolnym wyrazem.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">🔄</span><span class="meta-card-title">Rekurencja: prawa strona ≠ 0 → niejednorodna</span></div>
+                    <div class="meta-card-body">Jeśli po prawej stronie rekurencji jest <strong>≠ 0</strong> (np. = 3n, = 2) → <code>niejednorodna</code>. Jeśli <code>= 0</code> → jednorodna. Jeśli współczynnik zależy od n (np. <code>na_n</code>) → <strong>nieliniowa</strong>.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">📊</span><span class="meta-card-title">Grafy: odpowiedź NIGDY na D ani E</span></div>
+                    <div class="meta-card-body">W pytaniach o grafy (single-choice) poprawna jest <strong>tylko na pozycjach A, B, C</strong> (po ~33% każda). <code>D</code> i <code>E</code> mają <strong>0%</strong> poprawnych.</div>
+                </div>
+            </div>
         </div>
 
         <!-- Active Quiz Timer -->
