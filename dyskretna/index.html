@@ -378,6 +378,189 @@
         @media (max-width: 768px) {
             .meta-grid { grid-template-columns: 1fr; }
         }
+
+        /* Explanations Section */
+        .explanations-panel { padding: 10px 0; }
+        .explanations-intro {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(102, 187, 106, 0.15), rgba(79, 195, 247, 0.12));
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        .explanations-intro h2 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--green), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .explanations-intro p { color: var(--text-secondary); font-size: 1.05em; }
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+        .category-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .category-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+        .category-header {
+            padding: 18px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--card-bg), rgba(255,255,255,0.03));
+            border-bottom: 1px solid var(--border);
+        }
+        .category-header:hover { background: rgba(255,255,255,0.05); }
+        .category-icon {
+            font-size: 1.8em;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: var(--accent-glow);
+        }
+        .category-info { flex: 1; }
+        .category-title {
+            font-weight: 700;
+            font-size: 1.1em;
+            color: var(--text-primary);
+            margin-bottom: 3px;
+        }
+        .category-count {
+            font-size: 0.85em;
+            color: var(--text-muted);
+        }
+        .category-toggle {
+            font-size: 1.2em;
+            color: var(--text-muted);
+            transition: transform 0.3s;
+        }
+        .category-card.open .category-toggle { transform: rotate(180deg); }
+        .category-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+        .category-card.open .category-content { max-height: 2000px; }
+        .category-body { padding: 20px; }
+        .explanation-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        .explanation-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .explanation-title {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .explanation-content {
+            color: var(--text-secondary);
+            font-size: 0.92em;
+            line-height: 1.7;
+        }
+        .explanation-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .explanation-content li { margin-bottom: 8px; }
+        .explanation-content code {
+            background: var(--accent-glow);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: 0.93em;
+            font-weight: 600;
+        }
+        .explanation-content strong { color: var(--text-primary); }
+        .step-box {
+            background: rgba(102, 187, 106, 0.1);
+            border: 1px solid rgba(102, 187, 106, 0.3);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin: 10px 0;
+        }
+        .step-box .step-num {
+            display: inline-block;
+            background: var(--green);
+            color: #fff;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+        .formula-box {
+            background: rgba(79, 195, 247, 0.1);
+            border: 1px solid rgba(79, 195, 247, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 12px 0;
+            text-align: center;
+        }
+        .tip-box {
+            background: rgba(255, 167, 38, 0.1);
+            border-left: 4px solid var(--orange);
+            border-radius: 0 10px 10px 0;
+            padding: 12px 15px;
+            margin: 12px 0;
+        }
+        .tip-box::before { content: '💡 '; }
+        .related-questions {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border);
+        }
+        .related-questions-title {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .question-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .question-tag {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .question-tag:hover {
+            background: var(--accent-glow);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        @media (max-width: 768px) {
+            .category-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -405,6 +588,7 @@
             <button class="mode-tab" onclick="setMode('quiz')">🎯 Quiz</button>
             <button class="mode-tab" onclick="setMode('flashcards')">🃏 Fiszki</button>
             <button class="mode-tab" onclick="setMode('bookmarks')">⭐ Zakładki</button>
+            <button class="mode-tab" onclick="setMode('explanations')">📝 Wyjaśnienia</button>
             <button class="mode-tab" onclick="setMode('meta')">🧠 Meta</button>
         </div>
         
@@ -478,6 +662,673 @@
             <div style="text-align: center; margin-top: 20px;">
                 <button class="btn-primary" onclick="shuffleFlashcards()">🔀 Losuj kolejność</button>
                 <button class="btn-secondary" onclick="resetFlashcards()">↻ Resetuj postęp</button>
+            </div>
+        </div>
+        
+        <!-- Explanations Panel -->
+        <div id="explanationsPanel" class="explanations-panel hidden">
+            <div class="explanations-intro">
+                <h2>📝 Wyjaśnienia Typów Zadań</h2>
+                <p>Szczegółowe wyjaśnienia krok po kroku jak rozwiązywać każdy typ zadania z matematyki dyskretnej.</p>
+            </div>
+            <div class="category-grid">
+                
+                <!-- 1. Kombinatoryka -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">🎲</div>
+                        <div class="category-info">
+                            <div class="category-title">Kombinatoryka</div>
+                            <div class="category-count">Wariacje, kombinacje, permutacje, podziały zbiorów</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Kluczowe różnice</div>
+                                <div class="explanation-content">
+                                    <ul>
+                                        <li><strong>Wariacje</strong> — kolejność MA znaczenie (ciągi)</li>
+                                        <li><strong>Kombinacje</strong> — kolejność NIE ma znaczenia (zbiory)</li>
+                                        <li><strong>Permutacje</strong> — uporządkowanie WSZYSTKICH elementów</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🔢 Jak rozpoznać typ?</div>
+                                <div class="explanation-content">
+                                    <div class="step-box"><span class="step-num">1</span> Czy kolejność jest istotna? <strong>TAK → wariacja/permutacja</strong>, <strong>NIE → kombinacja</strong></div>
+                                    <div class="step-box"><span class="step-num">2</span> Czy elementy mogą się powtarzać? <strong>TAK → z powtórzeniami</strong>, <strong>NIE → bez powtórzeń</strong></div>
+                                    <div class="step-box"><span class="step-num">3</span> Ile elementów wybieramy z ilu? <code>k</code> z <code>n</code></div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">📊 Wzory</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        <strong>Wariacja bez powtórzeń:</strong> $V^n_k = \\frac{n!}{(n-k)!}$<br>
+                                        <strong>Wariacja z powtórzeniami:</strong> $\\bar{V}^n_k = n^k$<br>
+                                        <strong>Kombinacja bez powtórzeń:</strong> $C^n_k = \\binom{n}{k} = \\frac{n!}{k!(n-k)!}$<br>
+                                        <strong>Kombinacja z powtórzeniami:</strong> $\\bar{C}^n_k = \\binom{n+k-1}{k}$<br>
+                                        <strong>Permutacja:</strong> $P_n = n!$
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🎯 Pudełka i elementy</div>
+                                <div class="explanation-content">
+                                    <div class="tip-box"><strong>Rozróżnialne elementy + rozróżnialne pudełka</strong> → wariacja z powtórzeniami $n^k$</div>
+                                    <div class="tip-box"><strong>Identyczne elementy + rozróżnialne pudełka</strong> → kombinacja z powtórzeniami $\\binom{n+k-1}{k}$</div>
+                                    <p style="margin-top: 10px;">Gdy widzisz "można odróżnić" obiekty → <strong>kolejność istotna</strong> → wariacja<br>
+                                    Gdy "nie można odróżnić" obiektów → <strong>kolejność nieistotna</strong> → kombinacja</p>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(1); event.stopPropagation();">Pyt. 1</span>
+                                    <span class="question-tag" onclick="goToQuestion(2); event.stopPropagation();">Pyt. 2</span>
+                                    <span class="question-tag" onclick="goToQuestion(3); event.stopPropagation();">Pyt. 3</span>
+                                    <span class="question-tag" onclick="goToQuestion(4); event.stopPropagation();">Pyt. 4</span>
+                                    <span class="question-tag" onclick="goToQuestion(19); event.stopPropagation();">Pyt. 19</span>
+                                    <span class="question-tag" onclick="goToQuestion(20); event.stopPropagation();">Pyt. 20</span>
+                                    <span class="question-tag" onclick="goToQuestion(21); event.stopPropagation();">Pyt. 21</span>
+                                    <span class="question-tag" onclick="goToQuestion(22); event.stopPropagation();">Pyt. 22</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2. Indukcja matematyczna -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">🔄</div>
+                        <div class="category-info">
+                            <div class="category-title">Indukcja Matematyczna</div>
+                            <div class="category-count">Pierwsza i druga zasada indukcji</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Struktura dowodu indukcyjnego</div>
+                                <div class="explanation-content">
+                                    <div class="step-box"><span class="step-num">1</span> <strong>Krok bazowy:</strong> Udowodnij $S(n_0)$ (zwykle $S(1)$)</div>
+                                    <div class="step-box"><span class="step-num">2</span> <strong>Krok indukcyjny:</strong> Załóż $S(k)$ i udowodnij $S(k+1)$</div>
+                                    <div class="step-box"><span class="step-num">3</span> <strong>Wniosek:</strong> $\\forall_{n \\geq n_0} S(n)$</div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🔢 Pierwsza vs Druga Zasada</div>
+                                <div class="explanation-content">
+                                    <p><strong>Pierwsza zasada:</strong> $S(k) \\Rightarrow S(k+1)$ — zakładamy prawdziwość dla $k$</p>
+                                    <p><strong>Druga (silna) zasada:</strong> $[S(n_0) \\land S(n_0+1) \\land ... \\land S(k)] \\Rightarrow S(k+1)$ — zakładamy prawdziwość dla WSZYSTKICH poprzednich</p>
+                                    <div class="tip-box">Druga zasada — gdy do udowodnienia $S(k+1)$ potrzebujesz więcej niż jednego poprzedniego wyrazu (np. Fibonacci)</div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">⚠️ Na co uważać</div>
+                                <div class="explanation-content">
+                                    <ul>
+                                        <li>Indukcja działa tylko dla <strong>liczb całkowitych dodatnich</strong> lub <strong>naturalnych</strong></li>
+                                        <li>NIE dla liczb rzeczywistych, wymiernych ani całkowitych ujemnych!</li>
+                                        <li>W kroku indukcyjnym musimy pokazać implikację, nie prawdziwość obu stron osobno</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(5); event.stopPropagation();">Pyt. 5</span>
+                                    <span class="question-tag" onclick="goToQuestion(6); event.stopPropagation();">Pyt. 6</span>
+                                    <span class="question-tag" onclick="goToQuestion(7); event.stopPropagation();">Pyt. 7</span>
+                                    <span class="question-tag" onclick="goToQuestion(23); event.stopPropagation();">Pyt. 23</span>
+                                    <span class="question-tag" onclick="goToQuestion(24); event.stopPropagation();">Pyt. 24</span>
+                                    <span class="question-tag" onclick="goToQuestion(49); event.stopPropagation();">Pyt. 49</span>
+                                    <span class="question-tag" onclick="goToQuestion(50); event.stopPropagation();">Pyt. 50</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 3. Zależności rekurencyjne -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">♾️</div>
+                        <div class="category-info">
+                            <div class="category-title">Zależności Rekurencyjne</div>
+                            <div class="category-count">Równania charakterystyczne, Hanoi</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Rozpoznawanie typu zależności</div>
+                                <div class="explanation-content">
+                                    <div class="step-box"><span class="step-num">1</span> <strong>Rząd:</strong> różnica między najwyższym a najniższym indeksem<br>np. $a_{n+1} + a_{n-3} = 0$ → rząd = $(n+1) - (n-3) = 4$</div>
+                                    <div class="step-box"><span class="step-num">2</span> <strong>Jednorodna:</strong> po prawej stronie jest <code>0</code><br><strong>Niejednorodna:</strong> po prawej stronie jest coś innego niż 0</div>
+                                    <div class="step-box"><span class="step-num">3</span> <strong>Stałe współczynniki:</strong> współczynniki przy $a_n$ są stałe (nie zależą od $n$)</div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🔢 Metoda równania charakterystycznego</div>
+                                <div class="explanation-content">
+                                    <p>Działa TYLKO dla zależności <strong>liniowych jednorodnych ze stałymi współczynnikami</strong></p>
+                                    <div class="formula-box">
+                                        Dla $a_n + c_1 a_{n-1} + ... + c_k a_{n-k} = 0$<br>
+                                        Równanie charakterystyczne: $r^k + c_1 r^{k-1} + ... + c_k = 0$<br><br>
+                                        <strong>Różne pierwiastki:</strong> $a_n = c_1 r_1^n + c_2 r_2^n + ...$<br>
+                                        <strong>Pierwiastek podwójny r:</strong> $a_n = c_1 r^n + c_2 n r^n$
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🏰 Wieża Hanoi</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        $T_n = 2T_{n-1} + 1$, $T_0 = 0$<br>
+                                        Rozwiązanie: $T_n = 2^n - 1$
+                                    </div>
+                                    <div class="tip-box">To jest zależność <strong>niejednorodna rzędu 1</strong>, więc NIE można jej rozwiązać metodą równania charakterystycznego!</div>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(8); event.stopPropagation();">Pyt. 8</span>
+                                    <span class="question-tag" onclick="goToQuestion(9); event.stopPropagation();">Pyt. 9</span>
+                                    <span class="question-tag" onclick="goToQuestion(10); event.stopPropagation();">Pyt. 10</span>
+                                    <span class="question-tag" onclick="goToQuestion(25); event.stopPropagation();">Pyt. 25</span>
+                                    <span class="question-tag" onclick="goToQuestion(26); event.stopPropagation();">Pyt. 26</span>
+                                    <span class="question-tag" onclick="goToQuestion(27); event.stopPropagation();">Pyt. 27</span>
+                                    <span class="question-tag" onclick="goToQuestion(46); event.stopPropagation();">Pyt. 46</span>
+                                    <span class="question-tag" onclick="goToQuestion(47); event.stopPropagation();">Pyt. 47</span>
+                                    <span class="question-tag" onclick="goToQuestion(48); event.stopPropagation();">Pyt. 48</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 4. Liczby specjalne -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">🔢</div>
+                        <div class="category-info">
+                            <div class="category-title">Liczby Specjalne</div>
+                            <div class="category-count">Stirlinga, Fibonacciego, Eulera, harmoniczne</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Liczby Stirlinga</div>
+                                <div class="explanation-content">
+                                    <p><strong>I rodzaju $s(n,k)$:</strong> liczba permutacji n elementów z dokładnie k cyklami</p>
+                                    <p><strong>II rodzaju $S(n,k)$:</strong> liczba podziałów zbioru n-elementowego na k niepustych podzbiorów</p>
+                                    <div class="tip-box"><strong>Stirling II ≤ Stirling I</strong> — liczby II rodzaju są NIE WIĘKSZE niż I rodzaju!</div>
+                                    <div class="formula-box">
+                                        $S(n,n) = 1$, $s(n,n) = 1$ dla $n \\geq 0$<br>
+                                        $S(n,0) = 0$, $s(n,0) = 0$ dla $n > 0$
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🐇 Liczby Fibonacciego</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        $F_0 = 0$, $F_1 = 1$<br>
+                                        $F_n = F_{n-1} + F_{n-2}$ dla $n \\geq 2$
+                                    </div>
+                                    <p>To jest zależność rekurencyjna <strong>rzędu 2</strong> (nie 3, mimo że są 3 elementy!)</p>
+                                    <div class="tip-box"><strong>Twierdzenie Zeckendorfa:</strong> każda liczba całkowita dodatnia może być przedstawiona jako suma różnych, niesąsiadujących liczb Fibonacciego</div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">📈 Liczby Eulera</div>
+                                <div class="explanation-content">
+                                    <p><strong>Liczby Eulera I rzędu</strong> $\\langle n \\atop k \\rangle$: liczba permutacji n-elementowych z dokładnie k <strong>wzniesieniami</strong></p>
+                                    <p><em>Wzniesienie</em> — pozycja i, na której $a_i < a_{i+1}$</p>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🎵 Liczby harmoniczne</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">$H_n = 1 + \\frac{1}{2} + \\frac{1}{3} + ... + \\frac{1}{n} = \\sum_{k=1}^{n} \\frac{1}{k}$</div>
+                                    <div class="tip-box">Ciąg $H_n$ jest <strong>rozbieżny</strong> (rośnie do nieskończoności, ale bardzo wolno — logarytmicznie)</div>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(11); event.stopPropagation();">Pyt. 11</span>
+                                    <span class="question-tag" onclick="goToQuestion(28); event.stopPropagation();">Pyt. 28</span>
+                                    <span class="question-tag" onclick="goToQuestion(29); event.stopPropagation();">Pyt. 29</span>
+                                    <span class="question-tag" onclick="goToQuestion(51); event.stopPropagation();">Pyt. 51</span>
+                                    <span class="question-tag" onclick="goToQuestion(52); event.stopPropagation();">Pyt. 52</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 5. Zasada włączania i wyłączania -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">🔗</div>
+                        <div class="category-info">
+                            <div class="category-title">Zasada Włączania i Wyłączania</div>
+                            <div class="category-count">Suma zbiorów, 15 składników</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Formuła</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        $|A_1 \\cup A_2 \\cup ... \\cup A_n| = $<br>
+                                        $\\sum|A_i| - \\sum|A_i \\cap A_j| + \\sum|A_i \\cap A_j \\cap A_k| - ...$<br>
+                                        $+ (-1)^{n-1}|A_1 \\cap A_2 \\cap ... \\cap A_n|$
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🔢 Ile składników?</div>
+                                <div class="explanation-content">
+                                    <div class="tip-box">Dla <strong>n zbiorów</strong> mamy <strong>$2^n - 1$ składników</strong></div>
+                                    <p>Dla 4 zbiorów: $2^4 - 1 = 15$ składników!</p>
+                                    <p>Składniki: 4 pojedyncze + 6 par + 4 trójki + 1 czwórka = 15</p>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">⚡ Postać alternatywna</div>
+                                <div class="explanation-content">
+                                    <p>Ile elementów NIE spełnia ŻADNEGO warunku?</p>
+                                    <div class="formula-box">
+                                        $N(\\bar{c_1}\\bar{c_2}...\\bar{c_t}) = |S| - \\sum N(c_i) + \\sum N(c_ic_j) - ...$
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(30); event.stopPropagation();">Pyt. 30</span>
+                                    <span class="question-tag" onclick="goToQuestion(53); event.stopPropagation();">Pyt. 53</span>
+                                    <span class="question-tag" onclick="goToQuestion(54); event.stopPropagation();">Pyt. 54</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 6. Zasada szufladkowa -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">🗄️</div>
+                        <div class="category-info">
+                            <div class="category-title">Zasada Szufladkowa Dirichleta</div>
+                            <div class="category-count">Gołębnik, średnia liczność</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Klasyczna zasada</div>
+                                <div class="explanation-content">
+                                    <p>Jeśli $n+1$ obiektów rozmieścimy w $n$ szufladkach, to <strong>przynajmniej jedna szufladka</strong> zawiera <strong>co najmniej 2 obiekty</strong>.</p>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🔢 Uogólniona zasada</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        Jeśli $n$ obiektów rozmieścimy w $k$ szufladkach, to istnieje szufladka z <strong>co najmniej $\\lceil n/k \\rceil$</strong> obiektami.
+                                    </div>
+                                    <div class="tip-box"><strong>Średnia liczność</strong> zbiorów $A_1, ..., A_k$ tworzących pokrycie zbioru $S$ wynosi $\\frac{|S|}{k}$</div>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(55); event.stopPropagation();">Pyt. 55</span>
+                                    <span class="question-tag" onclick="goToQuestion(56); event.stopPropagation();">Pyt. 56</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 7. Relacje -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">↔️</div>
+                        <div class="category-info">
+                            <div class="category-title">Relacje</div>
+                            <div class="category-count">Zwrotność, symetria, przechodniość, porządki</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Własności relacji</div>
+                                <div class="explanation-content">
+                                    <ul>
+                                        <li><strong>Zwrotna:</strong> $\\forall x: (x,x) \\in \\rho$</li>
+                                        <li><strong>Przeciwzwrotna:</strong> $\\forall x: (x,x) \\notin \\rho$</li>
+                                        <li><strong>Symetryczna:</strong> $(x,y) \\in \\rho \\Rightarrow (y,x) \\in \\rho$</li>
+                                        <li><strong>Antysymetryczna:</strong> $(x,y) \\in \\rho \\land (y,x) \\in \\rho \\Rightarrow x = y$</li>
+                                        <li><strong>Przechodnia:</strong> $(x,y) \\in \\rho \\land (y,z) \\in \\rho \\Rightarrow (x,z) \\in \\rho$</li>
+                                        <li><strong>Spójna:</strong> $\\forall x \\neq y: (x,y) \\in \\rho \\lor (y,x) \\in \\rho$</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🎯 Typy relacji</div>
+                                <div class="explanation-content">
+                                    <div class="step-box"><span class="step-num">≡</span> <strong>Równoważność:</strong> zwrotna + symetryczna + przechodnia</div>
+                                    <div class="step-box"><span class="step-num">≤</span> <strong>Porządek częściowy:</strong> zwrotna + antysymetryczna + przechodnia</div>
+                                    <div class="step-box"><span class="step-num">≤</span> <strong>Porządek liniowy:</strong> zwrotna + antysymetryczna + przechodnia + <strong>spójna</strong></div>
+                                    <div class="tip-box">Porządek liniowy = porządek częściowy + spójność (czyli wszystkie elementy są porównywalne)</div>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(77); event.stopPropagation();">Pyt. 77</span>
+                                    <span class="question-tag" onclick="goToQuestion(88); event.stopPropagation();">Pyt. 88</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 8. Teoria grafów -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">🕸️</div>
+                        <div class="category-info">
+                            <div class="category-title">Teoria Grafów</div>
+                            <div class="category-count">Drzewa, Euler, Hamilton, przepływy, de Bruijn</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">🌳 Drzewa</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        <strong>$|V| = |E| + 1$</strong><br>
+                                        (wierzchołki = krawędzie + 1)
+                                    </div>
+                                    <p>Drzewo to graf spójny bez cykli. Między każdymi dwoma wierzchołkami istnieje <strong>dokładnie jedna ścieżka</strong>.</p>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🔄 Euler vs Hamilton</div>
+                                <div class="explanation-content">
+                                    <div class="tip-box"><strong>NIE MYL!</strong> Euler = krawędzie, Hamilton = wierzchołki</div>
+                                    <p><strong>Droga Eulera:</strong> przechodzi przez każdą KRAWĘDŹ dokładnie raz</p>
+                                    <p><strong>Ścieżka Hamiltona:</strong> przechodzi przez każdy WIERZCHOŁEK dokładnie raz</p>
+                                    <div class="formula-box">
+                                        <strong>Obwód Eulera</strong> istnieje ⟺ graf spójny + wszystkie wierzchołki parzystego stopnia<br>
+                                        <strong>Droga Eulera</strong> istnieje ⟺ graf spójny + dokładnie 2 wierzchołki nieparzystego stopnia
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🌊 Przepływy w sieci</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        <strong>Twierdzenie max-flow min-cut:</strong><br>
+                                        Maksymalny przepływ = minimalna przepustowość przekroju
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🔵 Graf dwudzielny</div>
+                                <div class="explanation-content">
+                                    <p>Zbiór wierzchołków można podzielić na 2 rozłączne podzbiory tak, że żadna krawędź nie łączy wierzchołków z tego samego podzbioru.</p>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🔷 Graf de Bruijna B(d,k)</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">Liczba wierzchołków: $d^k$</div>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(78); event.stopPropagation();">Pyt. 78</span>
+                                    <span class="question-tag" onclick="goToQuestion(79); event.stopPropagation();">Pyt. 79</span>
+                                    <span class="question-tag" onclick="goToQuestion(80); event.stopPropagation();">Pyt. 80</span>
+                                    <span class="question-tag" onclick="goToQuestion(82); event.stopPropagation();">Pyt. 82</span>
+                                    <span class="question-tag" onclick="goToQuestion(84); event.stopPropagation();">Pyt. 84</span>
+                                    <span class="question-tag" onclick="goToQuestion(86); event.stopPropagation();">Pyt. 86</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 9. Teoria liczb -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">🔣</div>
+                        <div class="category-info">
+                            <div class="category-title">Teoria Liczb</div>
+                            <div class="category-count">NWD, podzielność, liczby względnie pierwsze</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 NWD (GCD)</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        $\\gcd(a,b) = 1$ ⟺ a i b są <strong>względnie pierwsze</strong><br><br>
+                                        <strong>Tożsamość Bézouta:</strong> $\\gcd(a,b) = d$ ⟺ istnieją $x,y$ takie że $ax + by = d$
+                                    </div>
+                                    <div class="tip-box">$\\gcd(a,b) | c$ oznacza, że równanie $ax + by = c$ ma rozwiązanie całkowite</div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">➗ Podzielność</div>
+                                <div class="explanation-content">
+                                    <ul>
+                                        <li>$(a|b) \\land (a|c) \\Rightarrow a|(bx+cy)$ dla wszystkich $x,y \\in \\mathbb{Z}$</li>
+                                        <li>$(a|b) \\land (b|c) \\Rightarrow a|c$ (przechodniość)</li>
+                                        <li>Jeśli $a|b$ i $a|c$ i $x = y + z$, to $a$ dzieli trzecią liczbę</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(75); event.stopPropagation();">Pyt. 75</span>
+                                    <span class="question-tag" onclick="goToQuestion(90); event.stopPropagation();">Pyt. 90</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 10. Funkcje tworzące -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">📈</div>
+                        <div class="category-info">
+                            <div class="category-title">Funkcje Tworzące</div>
+                            <div class="category-count">Zwykłe i wykładnicze</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Funkcja tworząca (zwykła)</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        $f(x) = a_0 + a_1 x + a_2 x^2 + a_3 x^3 + ... = \\sum_{i=0}^{\\infty} a_i x^i$
+                                    </div>
+                                    <p>Reprezentuje sekwencję $(a_0, a_1, a_2, ...)$</p>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Wykładnicza funkcja tworząca</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        $f(x) = a_0 + a_1 x + \\frac{a_2 x^2}{2!} + \\frac{a_3 x^3}{3!} + ... = \\sum_{i=0}^{\\infty} \\frac{a_i x^i}{i!}$
+                                    </div>
+                                    <div class="tip-box">Wykładnicza ma <strong>silnię w mianowniku ($i!$)</strong>!</div>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(76); event.stopPropagation();">Pyt. 76</span>
+                                    <span class="question-tag" onclick="goToQuestion(83); event.stopPropagation();">Pyt. 83</span>
+                                    <span class="question-tag" onclick="goToQuestion(87); event.stopPropagation();">Pyt. 87</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 11. Logika -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">🧮</div>
+                        <div class="category-info">
+                            <div class="category-title">Logika i Tautologie</div>
+                            <div class="category-count">Reguły podstawiania, równoważności</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Reguły podstawiania</div>
+                                <div class="explanation-content">
+                                    <div class="step-box"><span class="step-num">1</span> Jeśli $P$ jest <strong>tautologią</strong> i zastąpimy wszystkie wystąpienia zmiennej $p$ zdaniem $R$, to wynik też jest <strong>tautologią</strong></div>
+                                    <div class="step-box"><span class="step-num">2</span> Jeśli $Q \\Leftrightarrow R$ i w zdaniu $P$ zastąpimy $Q$ przez $R$, to $P \\Leftrightarrow P_1$</div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">⚠️ Na co uważać</div>
+                                <div class="explanation-content">
+                                    <ul>
+                                        <li>Przy podstawianiu <strong>WSZYSTKIE</strong> wystąpienia zmiennej muszą być zastąpione</li>
+                                        <li>Implikacja $Q \\Rightarrow R$ NIE wystarczy do zachowania równoważności!</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(92); event.stopPropagation();">Pyt. 92</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 12. Notacja asymptotyczna -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">📉</div>
+                        <div class="category-info">
+                            <div class="category-title">Notacja Asymptotyczna</div>
+                            <div class="category-count">O, Ω, Θ</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Definicje</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        <strong>O (ograniczenie górne):</strong><br>
+                                        $O(g(n)) = \\{f(n): \\exists c,n_0 > 0: 0 \\leq f(n) \\leq c \\cdot g(n) \\text{ dla } n \\geq n_0\\}$<br><br>
+                                        <strong>Ω (ograniczenie dolne):</strong><br>
+                                        $\\Omega(g(n)) = \\{f(n): \\exists c,n_0 > 0: 0 \\leq c \\cdot g(n) \\leq f(n) \\text{ dla } n \\geq n_0\\}$<br><br>
+                                        <strong>Θ (ścisłe ograniczenie):</strong><br>
+                                        $\\Theta(g(n)) = O(g(n)) \\cap \\Omega(g(n))$
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">💡 Intuicja</div>
+                                <div class="explanation-content">
+                                    <ul>
+                                        <li><strong>O</strong> — "nie gorsza niż" (górna granica wzrostu)</li>
+                                        <li><strong>Ω</strong> — "nie lepsza niż" (dolna granica wzrostu)</li>
+                                        <li><strong>Θ</strong> — "dokładnie tak jak" (obie granice)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(93); event.stopPropagation();">Pyt. 93</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 13. Turnieje -->
+                <div class="category-card" onclick="toggleCategory(this)">
+                    <div class="category-header">
+                        <div class="category-icon">🏆</div>
+                        <div class="category-info">
+                            <div class="category-title">Turnieje</div>
+                            <div class="category-count">Definicja, wyniki</div>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        <div class="category-body">
+                            <div class="explanation-section">
+                                <div class="explanation-title">📌 Definicja turnieju</div>
+                                <div class="explanation-content">
+                                    <p>Turniej z $n$ graczami to zbiór $\\binom{n}{2}$ <strong>uporządkowanych par</strong>, gdzie dla każdej pary $i < j$ występuje albo $(i,j)$ albo $(j,i)$.</p>
+                                    <div class="tip-box">Turniej to graf pełny skierowany — każda para wierzchołków jest połączona dokładnie jednym łukiem</div>
+                                </div>
+                            </div>
+                            <div class="explanation-section">
+                                <div class="explanation-title">🔢 Wyniki turnieju</div>
+                                <div class="explanation-content">
+                                    <div class="formula-box">
+                                        Suma wyników wszystkich graczy = $\\binom{n}{2}$<br>
+                                        (bo każdy pojedynek daje dokładnie 1 punkt w sumie)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="related-questions">
+                                <div class="related-questions-title">📎 Powiązane pytania:</div>
+                                <div class="question-tags">
+                                    <span class="question-tag" onclick="goToQuestion(85); event.stopPropagation();">Pyt. 85</span>
+                                    <span class="question-tag" onclick="goToQuestion(91); event.stopPropagation();">Pyt. 91</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
             </div>
         </div>
         
@@ -811,12 +1662,13 @@
         function setMode(mode) {
             currentMode = mode;
             document.querySelectorAll('.mode-tab').forEach((tab, i) => {
-                tab.classList.toggle('active', ['learn', 'quiz', 'flashcards', 'bookmarks', 'meta'][i] === mode);
+                tab.classList.toggle('active', ['learn', 'quiz', 'flashcards', 'bookmarks', 'explanations', 'meta'][i] === mode);
             });
             
             // Hide all panels
             document.getElementById('quizPanel').classList.add('hidden');
             document.getElementById('flashcardsPanel').classList.add('hidden');
+            document.getElementById('explanationsPanel').classList.add('hidden');
             document.getElementById('metaPanel').classList.add('hidden');
             document.getElementById('learnControls').classList.add('hidden');
             document.getElementById('quizControls').classList.add('hidden');
@@ -855,10 +1707,38 @@
                 displayQuestions = questions.filter(q => bookmarks.has(q.id));
                 currentPage = 1;
                 renderQuestions();
+            } else if (mode === 'explanations') {
+                document.getElementById('explanationsPanel').classList.remove('hidden');
+                renderMath();
             } else if (mode === 'meta') {
                 document.getElementById('metaPanel').classList.remove('hidden');
             }
             updateStats();
+        }
+        
+        // === EXPLANATIONS FUNCTIONS ===
+        function toggleCategory(card) {
+            card.classList.toggle('open');
+            if (card.classList.contains('open')) {
+                renderMath();
+            }
+        }
+        
+        function goToQuestion(qId) {
+            setMode('learn');
+            const qIndex = questions.findIndex(q => q.id === qId);
+            if (qIndex !== -1) {
+                currentPage = Math.ceil((qIndex + 1) / questionsPerPage);
+                displayQuestions = prepareQuestionsWithShuffle(questions);
+                renderQuestions();
+                setTimeout(() => {
+                    const element = document.getElementById('question-' + qId);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        element.style.animation = 'pulse 1s ease 2';
+                    }
+                }, 100);
+            }
         }
         
         // === QUIZ LOGIC ===
