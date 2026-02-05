@@ -270,6 +270,114 @@
         .katex { color: var(--text-primary); }
         .option-text .katex { font-size: 1em; }
         .question-text .katex { font-size: 1.05em; }
+
+        /* META Section */
+        .meta-panel { padding: 10px 0; }
+        .meta-intro {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, var(--accent-glow), rgba(139, 92, 246, 0.12));
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+        .meta-intro h2 {
+            font-size: 1.8em;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .meta-intro p { color: var(--text-secondary); font-size: 1.05em; }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 16px;
+        }
+        .meta-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .meta-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            border-radius: 14px 0 0 14px;
+        }
+        .meta-card:nth-child(5n+1)::before { background: var(--accent); }
+        .meta-card:nth-child(5n+2)::before { background: var(--purple); }
+        .meta-card:nth-child(5n+3)::before { background: var(--green); }
+        .meta-card:nth-child(5n+4)::before { background: var(--orange); }
+        .meta-card:nth-child(5n+5)::before { background: var(--red); }
+        .meta-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .meta-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .meta-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px; height: 32px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.85em;
+            color: #fff;
+        }
+        .meta-card:nth-child(5n+1) .meta-number { background: var(--accent); }
+        .meta-card:nth-child(5n+2) .meta-number { background: var(--purple); }
+        .meta-card:nth-child(5n+3) .meta-number { background: var(--green); }
+        .meta-card:nth-child(5n+4) .meta-number { background: var(--orange); }
+        .meta-card:nth-child(5n+5) .meta-number { background: var(--red); }
+        .meta-card-title {
+            font-weight: 700;
+            font-size: 1em;
+            color: var(--text-primary);
+        }
+        .meta-card-body {
+            color: var(--text-secondary);
+            font-size: 0.92em;
+            line-height: 1.6;
+            padding-left: 12px;
+        }
+        .meta-card-body code {
+            background: var(--accent-glow);
+            color: var(--accent);
+            padding: 2px 7px;
+            border-radius: 5px;
+            font-size: 0.93em;
+            font-weight: 600;
+        }
+        .meta-card-body .meta-highlight {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-glow), rgba(139, 92, 246, 0.12));
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 2px 0;
+        }
+        .meta-card-body .meta-arrow {
+            color: var(--accent);
+            font-weight: 700;
+            margin: 0 4px;
+        }
+        @media (max-width: 768px) {
+            .meta-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -297,6 +405,7 @@
             <button class="mode-tab" onclick="setMode('quiz')">🎯 Quiz</button>
             <button class="mode-tab" onclick="setMode('flashcards')">🃏 Fiszki</button>
             <button class="mode-tab" onclick="setMode('bookmarks')">⭐ Zakładki</button>
+            <button class="mode-tab" onclick="setMode('meta')">🧠 Meta</button>
         </div>
         
         <!-- Quiz Settings Panel -->
@@ -372,6 +481,116 @@
             </div>
         </div>
         
+        <!-- META Panel -->
+        <div id="metaPanel" class="meta-panel hidden">
+            <div class="meta-intro">
+                <h2>🧠 META — Szybkie Wskazówki Egzaminacyjne</h2>
+                <p>Zbiór heurystyk i skrótów myślowych, które pomagają szybko wyeliminować błędne odpowiedzi na egzaminie.</p>
+            </div>
+            <div class="meta-grid">
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">1</span><span class="meta-card-title">Małe ziomeczki</span></div>
+                    <div class="meta-card-body">Szukaj odpowiedzi z <strong>małymi wartościami</strong> — jeśli coś wygląda na prostsze i mniejsze, prawdopodobnie to jest poprawna odpowiedź.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">2</span><span class="meta-card-title">Równoważność i tautologia</span></div>
+                    <div class="meta-card-body">Odpowiedzi dotyczące <strong>równoważności</strong> i <strong>tautologii</strong> — szukaj ich <strong>na początku</strong> listy odpowiedzi.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">3</span><span class="meta-card-title">Lewa strona kreseczki + najdłuższy</span></div>
+                    <div class="meta-card-body">Odpowiedź po <strong>lewej stronie kreseczki</strong> (separatora) <code>+</code> wybierz <strong>najdłuższą</strong> odpowiedź.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">4</span><span class="meta-card-title">n × n + nieatakujące</span></div>
+                    <div class="meta-card-body">Jeśli w 4/5 odpowiedzi jest <code>n×n</code>, to poprawna jest ta <strong>bez n×n</strong>.<br>Dodatkowo: <span class="meta-highlight">n×n w środku <span class="meta-arrow">&gt;</span> n×n na końcu</span></div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">5</span><span class="meta-card-title">(i, j) oraz (j, i)</span></div>
+                    <div class="meta-card-body">Gdy w odpowiedziach pojawiają się pary <code>(i, j)</code> oraz <code>(j, i)</code> — zwróć uwagę na <strong>symetrię relacji</strong>. Obie pary są kluczowe.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">6</span><span class="meta-card-title">Indukcja S(1)</span></div>
+                    <div class="meta-card-body">W pytaniach o <strong>indukcję matematyczną</strong> — szukaj odpowiedzi z <code>S(1)</code> (krok bazowy dla n=1).</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">7</span><span class="meta-card-title">15 składników</span></div>
+                    <div class="meta-card-body">Gdy pytanie dotyczy liczby składników — odpowiedzią jest <code>15</code>.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">8</span><span class="meta-card-title">S / k</span></div>
+                    <div class="meta-card-body">Szukaj odpowiedzi w postaci <code>S / k</code> — iloraz sumy przez liczbę elementów.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">9</span><span class="meta-card-title">Relacje — 4 warunki</span></div>
+                    <div class="meta-card-body">W pytaniach o relacje poprawna odpowiedź musi zawierać <strong>dokładnie 4 warunki</strong> (zwrotność, symetria, przechodniość, antysymetria itp.).</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">10</span><span class="meta-card-title">k-tego: d^k, n^k</span></div>
+                    <div class="meta-card-body">Odpowiedzi z potęgami: <code>d<sup>k</sup></code>, <code>n<sup>k</sup></code> — szukaj wzorów z wykładnikiem <code>k</code>. <em>(not sure)</em></div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">11</span><span class="meta-card-title">k!</span></div>
+                    <div class="meta-card-body">Szukaj odpowiedzi z <code>k!</code> — <strong>silnia</strong> pojawia się często w pytaniach o permutacje i kombinatorykę.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">12</span><span class="meta-card-title">Co najmniej</span></div>
+                    <div class="meta-card-body">Gdy w pytaniu pada <strong>"co najmniej"</strong> — odpowiedź zwykle zawiera to samo sformułowanie. Szukaj <code>co najmniej</code>.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">13</span><span class="meta-card-title">n⁰ = 1 lub ∀</span></div>
+                    <div class="meta-card-body">Szukaj odpowiedzi z <code>n<sup>0</sup> = 1</code> lub z <strong>kwantyfikatorem uniwersalnym</strong> <code>∀</code>.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">14</span><span class="meta-card-title">Brat bliźniak 0 + najdłuższy</span></div>
+                    <div class="meta-card-body">Szukaj odpowiedzi "bliźniaczej" do <code>0</code> (np. identyczna struktura ale z zerem) <code>+</code> wybierz <strong>najdłuższą</strong> opcję.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">15</span><span class="meta-card-title">x(n, n)</span></div>
+                    <div class="meta-card-body">Szukaj odpowiedzi w postaci <code>x(n, n)</code> — funkcja z dwoma identycznymi argumentami.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">16</span><span class="meta-card-title">Wielokrotność liczby</span></div>
+                    <div class="meta-card-body">Słowo <strong>przed</strong> „wielokrotność" jest kluczowe. Np. <span class="meta-highlight">dokładnie 3 <span class="meta-arrow">→</span> odpowiedź: dokładnie 9</span> (kwadrat lub wielokrotność).</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">17</span><span class="meta-card-title">gcd dzieli c</span></div>
+                    <div class="meta-card-body">W pytaniach o NWD: szukaj odpowiedzi <code>gcd(a,b) | c</code> — <strong>gcd dzieli c</strong>.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">18</span><span class="meta-card-title">Kombinacja z powtórzeniami</span></div>
+                    <div class="meta-card-body">2 grupy z 3 elementami w zbiorze 4-elementowym <span class="meta-arrow">→</span> <strong>kombinacja z powtórzeniami</strong>.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">19</span><span class="meta-card-title">n pudełek → permutacje</span></div>
+                    <div class="meta-card-body"><code>n</code> pudełek na końcu, a jeśli jest <code>k</code> pudełek <span class="meta-arrow">→</span> odpowiedź to <strong>permutacje</strong>.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">20</span><span class="meta-card-title">Droga Eulera → Ścieżka Hamiltona</span></div>
+                    <div class="meta-card-body">Nie myl pojęć! <span class="meta-highlight">Droga Eulera</span> (krawędzie) <span class="meta-arrow">→</span> <span class="meta-highlight">Ścieżka Hamiltona</span> (wierzchołki). Szukaj ścieżki Hamiltona.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">21</span><span class="meta-card-title">MinMax</span></div>
+                    <div class="meta-card-body">Szukaj odpowiedzi z <code>min-max</code> — optymalizacja przez minimalizację maksimum lub odwrotnie.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">22</span><span class="meta-card-title">Wieża Hanoi >>> wszystko</span></div>
+                    <div class="meta-card-body"><strong>Wieża Hanoi</strong> dominuje nad innymi odpowiedziami. Jeśli pojawia się jako opcja — <strong>prawie zawsze</strong> jest poprawna.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">23</span><span class="meta-card-title">Drzewo + jedna ścieżka</span></div>
+                    <div class="meta-card-body">W pytaniach o drzewa — szukaj odpowiedzi z <strong>dokładnie jedną ścieżką</strong> między dwoma wierzchołkami.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">24</span><span class="meta-card-title">2 Stirling < 1 Stirling</span></div>
+                    <div class="meta-card-body">Liczby Stirlinga: <span class="meta-highlight">II rodzaju <span class="meta-arrow">&lt;</span> I rodzaju</span>. Stirling 2 jest mniejszy od Stirling 1.</div>
+                </div>
+                <div class="meta-card">
+                    <div class="meta-card-header"><span class="meta-number">25</span><span class="meta-card-title">V = E + 1 oraz najdłuższy</span></div>
+                    <div class="meta-card-body">Drzewa: <code>V = E + 1</code> (wierzchołki = krawędzie + 1). Dodatkowo wybierz <strong>najdłuższą</strong> odpowiedź.</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Active Quiz Timer -->
         <div id="quizTimer" class="timer-display hidden">00:00</div>
         
@@ -516,12 +735,13 @@
         function setMode(mode) {
             currentMode = mode;
             document.querySelectorAll('.mode-tab').forEach((tab, i) => {
-                tab.classList.toggle('active', ['learn', 'quiz', 'flashcards', 'bookmarks'][i] === mode);
+                tab.classList.toggle('active', ['learn', 'quiz', 'flashcards', 'bookmarks', 'meta'][i] === mode);
             });
             
             // Hide all panels
             document.getElementById('quizPanel').classList.add('hidden');
             document.getElementById('flashcardsPanel').classList.add('hidden');
+            document.getElementById('metaPanel').classList.add('hidden');
             document.getElementById('learnControls').classList.add('hidden');
             document.getElementById('quizControls').classList.add('hidden');
             document.getElementById('searchFilter').classList.add('hidden');
@@ -559,6 +779,8 @@
                 displayQuestions = questions.filter(q => bookmarks.has(q.id));
                 currentPage = 1;
                 renderQuestions();
+            } else if (mode === 'meta') {
+                document.getElementById('metaPanel').classList.remove('hidden');
             }
             updateStats();
         }
