@@ -28,15 +28,54 @@
             --border: rgba(255, 255, 255, 0.1);
         }
         .light-mode {
-            --bg-primary: #f5f7fa;
-            --bg-secondary: #e8ecef;
-            --bg-tertiary: #dde1e4;
-            --text-primary: #2d3436;
-            --text-secondary: #636e72;
-            --text-muted: #95a5a6;
-            --card-bg: rgba(0, 0, 0, 0.03);
-            --border: rgba(0, 0, 0, 0.1);
+            --bg-primary: #f8f9fb;
+            --bg-secondary: #eef1f5;
+            --bg-tertiary: #e2e8f0;
+            --accent: #3b82f6;
+            --accent-dark: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.18);
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --yellow: #eab308;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --card-bg: #ffffff;
+            --border: rgba(148, 163, 184, 0.25);
         }
+        .light-mode body, .light-mode { background: linear-gradient(135deg, #f8f9fb 0%, #eef1f5 50%, #e2e8f0 100%); }
+        .light-mode .subtitle { color: #6366f1; }
+        .light-mode h1 { text-shadow: none; }
+        .light-mode .question-type { color: #6366f1; border-color: #a5b4fc; }
+        .light-mode .mode-panel h3,
+        .light-mode .quiz-type-card .title { color: #7c3aed; }
+        .light-mode .quiz-type-card { background: rgba(139, 92, 246, 0.08); border-color: rgba(139, 92, 246, 0.15); }
+        .light-mode .quiz-type-card:hover { border-color: #8b5cf6; }
+        .light-mode .quiz-type-card.selected { background: rgba(139, 92, 246, 0.18); border-color: #8b5cf6; }
+        .light-mode .custom-settings { background: rgba(59, 130, 246, 0.06); }
+        .light-mode .timer-display { background: rgba(59, 130, 246, 0.06); }
+        .light-mode .results-stat,
+        .light-mode .history-item { background: rgba(59, 130, 246, 0.06); }
+        .light-mode .page-info { color: #6366f1; }
+        .light-mode .shortcuts-hint code { background: rgba(99, 102, 241, 0.1); }
+        .light-mode .question-card { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
+        .light-mode .question-card:hover { border-color: rgba(99, 102, 241, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .light-mode .stat-box { background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .light-mode .option { background: #f8fafc; }
+        .light-mode .option:hover { background: #eff6ff; border-color: rgba(59, 130, 246, 0.3); }
+        .light-mode .option.selected { background: #eff6ff; border-color: #3b82f6; }
+        .light-mode .option.correct { background: #f0fdf4; border-color: #22c55e; }
+        .light-mode .option.incorrect { background: #fef2f2; border-color: #ef4444; }
+        .light-mode .option.missed { background: #fefce8; border-color: #eab308; }
+        .light-mode .btn-primary { color: #ffffff; }
+        .light-mode .question-number { color: #ffffff; }
+        .light-mode .mode-tab.active { color: #ffffff; }
+        .light-mode .mode-panel { border-color: #8b5cf6; }
+        .light-mode .search-box { background: #ffffff; }
+        .light-mode footer { color: #94a3b8; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -354,6 +393,7 @@
             <button class="btn-primary" onclick="checkAllAnswers()">✓ Sprawdź wszystkie</button>
             <button class="btn-secondary" onclick="resetProgress()">↻ Resetuj postęp</button>
             <button class="btn-secondary" onclick="shuffleQuestions()">🔀 Losuj kolejność</button>
+            <button class="btn-secondary" id="autoShuffleBtn" onclick="toggleAutoShuffle()">🔀 Auto-losuj: WYŁ</button>
         </div>
         
         <!-- Quiz Mode Controls -->
@@ -421,6 +461,7 @@
         let currentMode = 'learn', currentFilter = 'all', currentSearch = '', currentPage = 1, questionsPerPage = 10;
         let quizType = 'standard', quizActive = false, quizStartTime = null, quizTimeLimit = 0, timerInterval = null;
         let flashcardIndex = 0, knownCards = new Set(), flashcardQuestions = [];
+        let autoShuffle = false;
         let history = [];
         
         // === INITIALIZATION ===
@@ -732,26 +773,25 @@
         function renderQuestion(q, displayNum) {
             const isChecked = checkedQuestions.has(q.id);
             const answers = userAnswers[q.id] || [];
-            const isMultiple = q.multiple || q.options.filter(o => o.correct).length > 1;
             const isBookmarked = bookmarks.has(q.id);
             
             return `<div class="question-card ${isBookmarked ? 'bookmarked' : ''}" id="question-${q.id}">
                 <div class="question-header">
                     <span class="question-number">Pytanie ${displayNum}</span>
                     <div class="question-badges">
-                        <span class="question-type">${isMultiple ? 'Wielokrotny wybór' : 'Jednokrotny wybór'}</span>
+                        <span class="question-type">Wielokrotny wybór</span>
                         <button class="bookmark-btn" onclick="toggleBookmark(${q.id})">${isBookmarked ? '⭐' : '☆'}</button>
                     </div>
                 </div>
                 <div class="question-text">${q.question}</div>
-                <div class="options">${q.options.map((opt, idx) => renderOption(q, opt, idx, isChecked, answers, isMultiple)).join('')}</div>
+                <div class="options" id="options-${q.id}">${q.options.map((opt, idx) => renderOption(q, opt, idx, isChecked, answers)).join('')}</div>
                 <div class="question-actions">
-                    <button class="btn-primary" onclick="checkQuestion(${q.id})" style="padding: 8px 16px; font-size: 0.85em;" ${isChecked ? 'disabled' : ''}>${isChecked ? '✓ Sprawdzono' : 'Sprawdź'}</button>
+                    <button class="btn-primary" id="checkbtn-${q.id}" onclick="checkQuestion(${q.id})" style="padding: 8px 16px; font-size: 0.85em;" ${isChecked ? 'disabled' : ''}>${isChecked ? '✓ Sprawdzono' : 'Sprawdź'}</button>
                 </div>
             </div>`;
         }
         
-        function renderOption(q, opt, idx, isChecked, answers, isMultiple) {
+        function renderOption(q, opt, idx, isChecked, answers) {
             const isSelected = answers.includes(idx);
             let classes = 'option', icon = '';
             if (isChecked) {
@@ -759,34 +799,95 @@
                 else if (!opt.correct && isSelected) { classes += ' incorrect'; icon = '<span class="option-icon">✗</span>'; }
                 else if (opt.correct && !isSelected) { classes += ' missed'; icon = '<span class="option-icon">⚠</span>'; }
             } else if (isSelected) { classes += ' selected'; }
-            return `<label class="${classes}" onclick="selectOption(${q.id}, ${idx}, ${isMultiple})">
-                <input type="${isMultiple ? 'checkbox' : 'radio'}" name="q${q.id}" ${isSelected ? 'checked' : ''} ${isChecked ? 'disabled' : ''}>
+            return `<label class="${classes}" data-qid="${q.id}" data-idx="${idx}" onclick="selectOption(${q.id}, ${idx})">
+                <input type="checkbox" name="q${q.id}" ${isSelected ? 'checked' : ''} ${isChecked ? 'disabled' : ''}>
                 <span class="option-text">${opt.text}</span>${icon}
             </label>`;
         }
         
-        function selectOption(qId, optIdx, multiple) {
+        function selectOption(qId, optIdx) {
             if (checkedQuestions.has(qId)) return;
             if (!userAnswers[qId]) userAnswers[qId] = [];
-            if (multiple) {
-                const idx = userAnswers[qId].indexOf(optIdx);
-                if (idx > -1) userAnswers[qId].splice(idx, 1);
-                else userAnswers[qId].push(optIdx);
-            } else { userAnswers[qId] = [optIdx]; }
+            const idx = userAnswers[qId].indexOf(optIdx);
+            if (idx > -1) userAnswers[qId].splice(idx, 1);
+            else userAnswers[qId].push(optIdx);
             saveProgress();
-            renderQuestions();
+            // Update UI in-place instead of full re-render (preserves KaTeX)
+            updateOptionStates(qId);
+        }
+        
+        function updateOptionStates(qId) {
+            const container = document.getElementById('options-' + qId);
+            if (!container) return;
+            const answers = userAnswers[qId] || [];
+            const labels = container.querySelectorAll('label[data-qid="' + qId + '"]');
+            labels.forEach(label => {
+                const optIdx = parseInt(label.getAttribute('data-idx'));
+                const isSelected = answers.includes(optIdx);
+                const checkbox = label.querySelector('input');
+                if (checkbox) checkbox.checked = isSelected;
+                label.classList.toggle('selected', isSelected);
+            });
         }
         
         function toggleBookmark(qId) {
             if (bookmarks.has(qId)) bookmarks.delete(qId);
             else bookmarks.add(qId);
             saveProgress();
-            renderQuestions();
+            // Update bookmark icon in-place
+            const card = document.getElementById('question-' + qId);
+            if (card) {
+                const btn = card.querySelector('.bookmark-btn');
+                if (btn) btn.textContent = bookmarks.has(qId) ? '⭐' : '☆';
+                card.classList.toggle('bookmarked', bookmarks.has(qId));
+            }
         }
         
         // === CHECKING ===
-        function checkQuestion(qId) { checkedQuestions.add(qId); saveProgress(); updateStats(); renderQuestions(); }
-        function checkAllAnswers() { displayQuestions.forEach(q => { if (userAnswers[q.id]?.length > 0) checkedQuestions.add(q.id); }); saveProgress(); updateStats(); renderQuestions(); }
+        function checkQuestion(qId) {
+            checkedQuestions.add(qId);
+            saveProgress();
+            updateStats();
+            // Update the question card in-place to show results (preserves KaTeX)
+            const q = questions.find(q => q.id === qId) || displayQuestions.find(q => q.id === qId);
+            if (!q) { renderQuestions(); return; }
+            const container = document.getElementById('options-' + qId);
+            if (!container) { renderQuestions(); return; }
+            const answers = userAnswers[qId] || [];
+            const labels = container.querySelectorAll('label[data-qid="' + qId + '"]');
+            labels.forEach(label => {
+                const optIdx = parseInt(label.getAttribute('data-idx'));
+                const opt = q.options[optIdx];
+                const isSelected = answers.includes(optIdx);
+                const checkbox = label.querySelector('input');
+                if (checkbox) checkbox.disabled = true;
+                label.classList.remove('selected');
+                // Remove old icons
+                const oldIcon = label.querySelector('.option-icon');
+                if (oldIcon) oldIcon.remove();
+                if (opt.correct && isSelected) {
+                    label.className = 'option correct';
+                    label.insertAdjacentHTML('beforeend', '<span class="option-icon">✓</span>');
+                } else if (!opt.correct && isSelected) {
+                    label.className = 'option incorrect';
+                    label.insertAdjacentHTML('beforeend', '<span class="option-icon">✗</span>');
+                } else if (opt.correct && !isSelected) {
+                    label.className = 'option missed';
+                    label.insertAdjacentHTML('beforeend', '<span class="option-icon">⚠</span>');
+                } else {
+                    label.className = 'option';
+                }
+            });
+            const btn = document.getElementById('checkbtn-' + qId);
+            if (btn) { btn.disabled = true; btn.innerHTML = '✓ Sprawdzono'; }
+        }
+        function checkAllAnswers() {
+            displayQuestions.forEach(q => { if (userAnswers[q.id]?.length > 0) checkedQuestions.add(q.id); });
+            saveProgress();
+            updateStats();
+            // Re-render fully for check-all since many cards changed
+            renderQuestions();
+        }
         
         function isQuestionCorrect(q) {
             const answers = userAnswers[q.id] || [];
@@ -821,6 +922,13 @@
         
         function filterQuestions() { currentSearch = document.getElementById('searchBox').value; currentPage = 1; renderQuestions(); }
         function shuffleQuestions() { displayQuestions.sort(() => Math.random() - 0.5); currentPage = 1; renderQuestions(); }
+        function toggleAutoShuffle() {
+            autoShuffle = !autoShuffle;
+            const btn = document.getElementById('autoShuffleBtn');
+            if (btn) btn.textContent = autoShuffle ? '🔀 Auto-losuj: WŁ' : '🔀 Auto-losuj: WYŁ';
+            if (autoShuffle) shuffleQuestions();
+            localStorage.setItem('dyskretna_autoshuffle', autoShuffle ? '1' : '0');
+        }
         function prevPage() { if (currentPage > 1) { currentPage--; renderQuestions(); window.scrollTo(0, 0); } }
         function nextPage() { const totalPages = Math.ceil(getFilteredQuestions().length / questionsPerPage); if (currentPage < totalPages) { currentPage++; renderQuestions(); window.scrollTo(0, 0); } }
         
@@ -939,7 +1047,7 @@
         "correct": false
       },
       {
-        "text": "Wszystkie podziały pewnego zbioru $n$-elementowego można wygenerować za pomocą generacji wszystkich liczb binarnych z zakresu od $0$ do $2^n - 1$.",
+        "text": "Wszystkie podziały pewnego zbioru $n$-elementowego można wygenerować za pomocą generacji wszystkich liczb binarnych z zakresu od $0$ do $2^n-1$.",
         "correct": false
       }
     ],
@@ -947,7 +1055,7 @@
   },
   {
     "id": 2,
-    "question": "Obiekty kombinatoryczne $B, A, C$ i $C, A, B$ utworzone ze zbioru $\\{A, B, C, D\\}$ są identyczne (nie można ich odróżnić). Podane obiekty mogą być przykładem:",
+    "question": "Obiekty kombinatoryczne $B, A, C$ i $C, A, B$ utworzone ze zbioru $\\{A, B, C, D\\}$ i są identyczne (nie można ich odróżnić). Podane obiekty mogą być przykładem:",
     "options": [
       {
         "text": "podziału zbioru na dwa podzbiory.",
@@ -1116,11 +1224,11 @@
         "correct": true
       },
       {
-        "text": "Rozwiązanie liniowej niejednorodnej zależności rekurencyjnej rzędu pierwszego ze stałymi współczynnikami, postaci $a_{n+1} + ca_n = f(n)$ jest dane wzorem: $a_n = a_0 d^n$ gdzie $d_0$ i $d$ oznaczają pewne stałe, $n \\in \\mathbb{N}$.",
+        "text": "Rozwiązanie liniowej niejednorodnej zależności rekurencyjnej rzędu pierwszego ze stałymi współczynnikami, postaci $a_{n+1} + c a_n = f(n)$ jest dane wzorem: $a_n = a_0 d^n$ gdzie $d_0$ i $d$ oznaczają pewne stałe, $n \\in \\mathbb{N}$.",
         "correct": false
       },
       {
-        "text": "Rozwiązanie liniowej niejednorodnej zależności rekurencyjnej rzędu drugiego ze stałymi współczynnikami, ma postać $a_n = c_1 r_1^n + c_2 r_2^n$ lub $a_n = c_1 r_1^n + c_2 n r^n$ w zależności od liczby różnych pierwiastków równania charakterystycznego.",
+        "text": "Rozwiązanie liniowej niejednorodnej zależności rekurencyjnej rzędu drugiego ze stałymi współczynnikami, ma postać $ a_n = c_1 r_1^n + c_2 r_2^n$ lub $a_n = c_1 r_1^n + c_2 n r^n$ w zależności od liczby różnych pierwiastków równania charakterystycznego.",
         "correct": false
       },
       {
@@ -1136,7 +1244,7 @@
   },
   {
     "id": 9,
-    "question": "Zależność rekurencyjna $(a_0=0, a_1=3, a_2=4, a_3=6, 2a_{n+1}+3a_{n-3}=0$ dla $n \\geq 3)$ jest zależnością rekurencyjną:",
+    "question": "Zależność rekurencyjna $(a_0 = 0, a_1 = 3, a_2 = 4, a_3 = 6, 2a_{n+1} + 3a_{n-3} = 0 \\text{ dla } n \\geq 3)$ jest zależnością rekurencyjną:",
     "options": [
       {
         "text": "liniową ze stałymi współczynnikami rzędu czwartego jednorodną.",
@@ -1163,7 +1271,7 @@
   },
   {
     "id": 10,
-    "question": "Zależność rekurencyjna $(a_0=1, a_1=2, a_2=3, a_n+5a_{n-1}-4a_{n-3}=0$ dla $n \\geq 3)$ jest zależnością:",
+    "question": "Zależność rekurencyjna $(a_0 = 1, a_1 = 2, a_2 = 3, a_n + 5a_{n-1} - 4a_{n-3} = 0 \\text{ dla } n \\geq 3)$ jest zależnością:",
     "options": [
       {
         "text": "która nie może być rozwiązana metodą równania charakterystycznego.",
@@ -1197,7 +1305,7 @@
         "correct": false
       },
       {
-        "text": "Z definicji przyjmuje się, że liczba Stirlinga drugiego rodzaju $S(n,n)=1$ dla $n \\geq 0$, ponieważ opisywany przez nią podział jest niemożliwy.",
+        "text": "Z definicji przyjmuje się, że liczba Stirlinga drugiego rodzaju $S(n,n) = 1$ dla $n \\geq 0$, ponieważ opisywany przez nią podział jest niemożliwy.",
         "correct": false
       },
       {
@@ -1205,7 +1313,7 @@
         "correct": false
       },
       {
-        "text": "Liczby Eulera pierwszego rzędu $\\langle n \\atop k \\rangle$ oznaczają liczbę $n$-elementowych permutacji bez powtórzeń ze zbioru $n$-elementowego zawierających $k$ wzniesień.",
+        "text": "Liczby Eulera pierwszego rzędu $\\left\\langle \\begin{array}{c} n \\\\ k \\end{array} \\right\\rangle$ oznaczają liczbę $n$-elementowych permutacji bez powtórzeń ze zbioru $n$-elementowego zawierających $k$ wzniesień.",
         "correct": true
       },
       {
@@ -1228,7 +1336,7 @@
         "correct": false
       },
       {
-        "text": "Za pomocą liczb Stirlinga pierwszego rodzaju $s(n,k)$, $k=0,1,...,n$, można obliczyć wartość funkcji $n!$.",
+        "text": "Za pomocą liczb Stirlinga pierwszego rodzaju $s(n, k)$, $k = 0, 1, \\dots, n$, można obliczyć wartość funkcji $n!$.",
         "correct": true
       },
       {
@@ -1247,15 +1355,15 @@
     "question": "Zaznacz zdanie prawdziwe:",
     "options": [
       {
-        "text": "Zasada włączania i wyłączania ma postać: $|\\bigcup_{i=1}^{n} A_i| = \\sum_{i=1}^{n} |A_i| + \\sum_{1 \\leq i < j \\leq n} |A_i \\cap A_j| + ... + (-1)^{n-1} |A_1 \\cap A_2 \\cap ... \\cap A_n|$",
+        "text": "Zasada włączania i wyłączania ma postać:  $\\left| \\bigcup_{i=1}^{n} A_i \\right| = \\sum_{i=1}^{n} |A_i| + \\sum_{1 \\leq i < j \\leq n} |A_i \\cap A_j| + \\dots + (-1)^{n-1} |A_1 \\cap A_2 \\cap \\dots \\cap A_n|$",
         "correct": false
       },
       {
-        "text": "Zasada włączania i wyłączania mówi, że aby wyznaczyć liczbę elementów zbioru $A_1 \\cup A_2 \\cup ... \\cup A_n$, należy zanalizować wszystkie możliwe przecięcia (części wspólne) zbiorów z rodziny $\\{A_1, A_2, ..., A_n\\}$ i dodać liczność przecięć nieparzystej liczby zbiorów oraz odjąć liczność przecięć parzystej liczby zbiorów.",
+        "text": "Zasada włączania i wyłączania, mówi, że aby wyznaczyć liczbę elementów zbioru $A_1 \\cup A_2 \\cup \\dots \\cup A_n$, należy zanalizować wszystkie możliwe przecięcia (części wspólne) zbiorów z rodziny $\\{A_1, A_2, \\dots, A_n\\}$ i dodać liczność przecięć nieparzystej liczby zbiorów oraz odjąć liczność przecięć parzystej liczby zbiorów.",
         "correct": true
       },
       {
-        "text": "Zasada włączania i wyłączania mówi, że aby wyznaczyć liczbę elementów zbioru $A_1 \\cap A_2 \\cap ... \\cap A_n$, należy zanalizować wszystkie możliwe przecięcia zbiorów z rodziny $\\{A_1, A_2, ..., A_n\\}$ i dodać liczność przecięć parzystej liczby zbiorów oraz odjąć liczność przecięć nieparzystej liczby zbiorów.",
+        "text": "Zasada włączania i wyłączania, mówi, że aby wyznaczyć liczbę elementów zbioru $A_1 \\cap A_2 \\cap \\dots \\cap A_n$, należy zanalizować wszystkie możliwe przecięcia zbiorów z rodziny $\\{A_1, A_2, \\dots, A_n\\}$ i dodać liczność przecięć parzystej liczby zbiorów oraz odjąć liczność przecięć nieparzystej liczby zbiorów.",
         "correct": false
       },
       {
@@ -1263,7 +1371,7 @@
         "correct": false
       },
       {
-        "text": "Prawo sumy (pozwalające na wyznaczenie liczności sumy dwóch zbiorów) nie jest równoważne zasadzie włączania i wyłączania (pozwalającej na wyznaczenie liczności sumy zbiorów $A_1, ..., A_n$ dla $n=2$.",
+        "text": "Prawo sumy (pozwalające na wyznaczenie liczności sumy dwóch zbiorów) nie jest równoważne zasadzie włączania i wyłączania (pozwalającej na wyznaczenie liczności sumy zbiorów $A_1, \\dots, A_n$ dla $n=2$.",
         "correct": false
       }
     ],
@@ -1309,11 +1417,11 @@
         "correct": false
       },
       {
-        "text": "Uogólniona zasada szufladkowa sprowadza się do \\\"klasycznej\\\" zasady szufladkowej, gdy każdy z elementów analizowanego zbioru $S$ należy do co najmniej jednego podzbioru spośród $A_1, ..., A_k$.",
+        "text": "Uogólniona zasada szufladkowa sprowadza się do „klasycznej” zasady szufladkowej, gdy każdy z elementów analizowanego zbioru $S$ należy do co najmniej jednego podzbioru spośród $A_1, \\dots, A_k$.",
         "correct": false
       },
       {
-        "text": "Uogólniona zasada szufladkowa Dirichleta określa minimalną wartość średniej arytmetycznej liczb elementów zbiorów $A_1, ..., A_k$ będących podzbiorami skończonego zbioru $S$, takimi że każdy element zbioru $S$ należy do co najmniej 1 spośród zbiorów $A_i$ $(1 \\leq |S|/k)$.",
+        "text": "Uogólniona zasada szufladkowa Dirichleta określa minimalną wartość średniej arytmetycznej liczb elementów zbiorów $A_1, \\dots, A_k$ będących podzbiorami skończonego zbioru $S$, takimi że każdy element zbioru $S$ należy do co najmniej 1 spośród zbiorów $A_i$ ($1 \\leq |S|/k$).",
         "correct": true
       },
       {
@@ -1325,7 +1433,7 @@
   },
   {
     "id": 16,
-    "question": "Jeśli zbiór 12-elementowy zostanie podzielony w dowolny sposób na 3 niepuste rozłączne podzbiory, to",
+    "question": "Jeśli zbiór 12 elementowy zostanie podzielony w dowolny sposób na 3 niepuste rozłączne podzbiory, to",
     "options": [
       {
         "text": "dokładnie jeden podzbiór zawiera 4 elementy lub więcej.",
@@ -1355,11 +1463,11 @@
     "question": "Zaznacz zdanie prawdziwe.",
     "options": [
       {
-        "text": "Macierz o wymiarze $p \\times p$ zbudowaną z elementów ze zbioru $\\{1, ..., n\\}$, gdzie $p < n$, w której w żadnym wierszu i kolumnie elementy się nie powtarzają nazywamy kwadratem łacińskim.",
+        "text": "Macierz o wymiarze $p \\times p$ zbudowaną z elementów ze zbioru $\\{1, \\dots, n\\}$, gdzie $p < n$, w której w żadnym wierszu i kolumnie elementy się nie powtarzają nazywamy kwadratem łacińskim.",
         "correct": false
       },
       {
-        "text": "Rozszerzenie prostokąta łacińskiego $p \\times q$ (gdzie $p \\leq n$, $q < n$) do kwadratu $n \\times n$ nie jest możliwe, jeśli dla pewnego elementu $l$ $(1 \\leq l \\leq n)$ liczba jego wystąpień w prostokącie $L(l)$ jest mniejsza od $p + q - n$.",
+        "text": "Rozszerzenie prostokąta łacińskiego $p \\times q$ ($p \\leq n$, $q < n$) do kwadratu $n \\times n$ nie jest możliwe, jeśli dla pewnego elementu $l$ ($1 \\leq l \\leq n$) liczba jego wystąpień w prostokącie $l(l)$ jest mniejsza od $p + q - n$.",
         "correct": true
       },
       {
@@ -1386,7 +1494,7 @@
         "correct": false
       },
       {
-        "text": "Wielomian szachowy dla obszaru $B$ o wymiarze $n \\times n$, postaci $r(x) = 1 + r_1 x + r_2 x^2 + ... + r_n x^n$, nie zawiera niezerowych współczynników $r_k$ dla $k > n$, ponieważ nie można ustawić więcej niż $n$ wzajemnie nieatakujących się wież na szachownicy o wymiarze $n \\times n$.",
+        "text": "Wielomian szachowy dla obszaru $B$ o wymiarze $n \\times n$, postaci $r(x) = 1 + r_1 x + r_2 x^2 + \\dots + r_n x^n$, nie zawiera niezerowych współczynników $r_k$ dla $k > n$, ponieważ nie można ustawić więcej niż $n$ wzajemnie nieatakujących się wież na szachownicy o wymiarze $n \\times n$.",
         "correct": true
       },
       {
@@ -1394,7 +1502,7 @@
         "correct": false
       },
       {
-        "text": "Jeśli szachownica $B$ składa się z dwóch niezależnych obszarów $C, D$, to wówczas $r(x) = r(C) + x \\cdot r(D)$.",
+        "text": "Jeśli szachownica $B$ składa się z dwóch niezależnych obszarów $C, D$, to wówczas $r(x) = r(C) + x r(D)$.",
         "correct": false
       },
       {
@@ -1425,7 +1533,7 @@
         "correct": false
       },
       {
-        "text": "Istnieje $b^b$ różnych $b$-wyrazowych wariacji z powtórzeniami ze zbioru $a$-elementowego (gdzie $a \\leq b$ lub $b < a$).",
+        "text": "Istnieje $b^b$ różnych $b$-wyrazowych wariacji z powtórzeniami ze zbioru $a$-elementowego $(a \\leq b$ lub $b < a)$.",
         "correct": false
       }
     ],
@@ -1479,7 +1587,7 @@
         "correct": false
       },
       {
-        "text": "Liczba wszystkich $k$-elementowych kombinacji z powtórzeniami ze zbioru $n$-elementowego wynosi $\\binom{k+n-1}{n}$ gdzie $k < n$.",
+        "text": "Liczba wszystkich $k$-elementowych kombinacji z powtórzeniami ze zbioru $n$-elementowego wynosi $\\binom{k + n - 1}{n}$ gdzie $k < n$.",
         "correct": false
       }
     ],
@@ -1517,11 +1625,11 @@
     "question": "Zaznacz zdanie prawdziwe.",
     "options": [
       {
-        "text": "Pierwsza zasada indukcji matematycznej może być sformułowana następująco $[S(1) \\land (\\forall k \\geq 1 \\ S(k) \\Rightarrow S(k+1))] \\Rightarrow \\forall n \\geq 1 \\ S(n)$, gdzie $S(n)$ oznacza zdanie otwarte, w którym występuje pewna liczba całkowita dodatnia $n$.",
+        "text": "Pierwsza zasada indukcji matematycznej może być sformułowana następująco $[S(1) \\land (\\forall_{k\\geq 1} S(k) \\Rightarrow S(k+1))] \\Rightarrow \\forall_{n\\geq1} S(n)$, gdzie $S(n)$ oznacza zdanie otwarte, w którym występuje pewna liczba całkowita dodatnia $n$.",
         "correct": true
       },
       {
-        "text": "Pierwsza zasada indukcji może być podana dla dowolnego elementu $n_0$, od którego rozpoczyna się proces indukcyjny i przyjmuje wówczas postać $[S(n_0) \\land (S(k) \\Rightarrow S(k+1))] \\Rightarrow \\forall n \\geq n_0 \\ S(n)$.",
+        "text": "Pierwsza zasada indukcji może być podana dla dowolnego elementu $n_0$, od którego rozpoczyna się proces indukcyjny i przyjmuje wówczas postać $[S(n_0) \\land (S(k) \\Rightarrow S(k+1))] \\Rightarrow \\forall_{n \\geq n_{0}} S(n)$.",
         "correct": false
       },
       {
@@ -1575,11 +1683,11 @@
         "correct": false
       },
       {
-        "text": "Każda zależność postaci $c_n a_n + c_{n-1} a_{n-1} + ... + c_{n-k} a_{n-k} = 0$, gdzie $c_i$ dla $i = n-k, ..., n$ są zupełnie dowolnymi stałymi rzeczywistymi, jest liniową zależnością rekurencyjną rzędu $k$-tego.",
+        "text": "Każda zależność postaci $c_n a_n + c_{n-1} a_{n-1} + \\ldots + c_{n-k} a_{n-k} = 0$, gdzie $c_i$ dla $i = n-k, \\ldots, n$ są zupełnie dowolnymi stałymi rzeczywistymi, jest liniową zależnością rekurencyjną rzędu $k$-tego.",
         "correct": true
       },
       {
-        "text": "Rozwiązanie liniowej jednorodnej zależności rekurencyjnej rzędu pierwszego ze stałymi współczynnikami postaci $a_{n+1} + ca_n = 0$ jest dane wzorem $a_n = a_0 b^n$, gdzie $b = -c$, a $c$ oznacza pewną stałą i nie $\\in \\mathbb{N}$.",
+        "text": "Rozwiązanie liniowej jednorodnej zależności rekurencyjnej rzędu pierwszego ze stałymi współczynnikami postaci $a_{n+1} + c a_n = 0$ jest dane wzorem $a_n = a_0 b^n$, gdzie $b = -c$, a $c$ oznacza pewną stałą i nie $\\in \\mathbb{N}$.",
         "correct": false
       },
       {
@@ -1595,7 +1703,7 @@
   },
   {
     "id": 26,
-    "question": "Zależność rekurencyjna $(a_0=0, a_1=3, a_2=4, a_3=6, 2a_n + 3a_{n-4} = 2$ dla $n \\geq 4)$ jest zależnością rekurencyjną:",
+    "question": "Zależność rekurencyjna $ (a_0 = 0, a_1 = 3, a_2 = 4, a_3 = 6, 2a_{n} + 3a_{n-4} = 2 $ dla $ n \\geq 4 $ jest zależnością rekurencyjną:",
     "options": [
       {
         "text": "liniową ze stałymi współczynnikami rzędu drugiego jednorodną.",
@@ -1622,7 +1730,7 @@
   },
   {
     "id": 27,
-    "question": "Zależność rekurencyjna $(a_0=1, a_1=2, a_2=3, a_3=4, a_{n+1}+5a_{n-1}-4a_{n-3}=0)$ dla $n \\geq 3$ jest zależnością:",
+    "question": "Zależność rekurencyjna $ (a_0 = 1, a_1 = 2, a_2 = 3, a_3 = 4, a_{n+1} + 5a_{n-1} - 4a_{n-3} = 0) $ dla $ n \\geq 3 $ jest zależnością:",
     "options": [
       {
         "text": "która nie może być rozwiązana metodą równania charakterystycznego.",
@@ -1652,15 +1760,15 @@
     "question": "Zaznacz zdanie prawdziwe.",
     "options": [
       {
-        "text": "Wyrażenia postaci $x(n,n)=1$, $n \\geq 0$ oraz $x(n,0)=0$, $n>0$ są składnikami definicji rekurencyjnej liczb Stirlinga zarówno pierwszego ($x=s$), jak i drugiego rodzaju ($x=S$).",
+        "text": "Wyrażenia postaci $x(n, n) = 1, n \\geq 0$ oraz $x(n, 0) = 0, n > 0$ są składnikami definicji rekurencyjnej liczb Stirlinga zarówno pierwszego ($x = s$), jak i drugiego rodzaju ($x = S$).",
         "correct": true
       },
       {
-        "text": "Z definicji przyjmuje się, że liczba Stirlinga pierwszego rodzaju $s(n,n)=1$ dla $n \\geq 0$, ponieważ opisywane przez nią rozmieszczenie obiektów w cyklach jest niemożliwe.",
+        "text": "Z definicji przyjmuje się, że liczba Stirlinga pierwszego rodzaju $s(n, n) = 1$ dla $n \\geq 0$, ponieważ opisywane przez nią rozmieszczenie obiektów w cyklach jest niemożliwe.",
         "correct": false
       },
       {
-        "text": "Liczby Eulera drugiego rzędu $\\langle\\langle n \\atop k \\rangle\\rangle$ oznaczają liczbę dowolnych permutacji z powtórzeniami ze zbioru $n$-elementowego zawierających $k$ wniesień takich, że pomiędzy poszczególnymi wystąpieniami pewnej liczby znajdują się tylko liczby większe od niej.",
+        "text": "Liczby Eulera drugiego rzędu $\\left\\langle\\left\\langle \\begin{array}{c} n \\\\ k \\end{array} \\right\\rangle\\right\\rangle$ oznaczają liczbę dowolnych permutacji z powtórzeniami ze zbioru $n$-elementowego zawierających $k$ wniesień takich, że pomiędzy poszczególnymi wystąpieniami pewnej liczby znajdują się tylko liczby większe od niej.",
         "correct": false
       },
       {
@@ -1710,7 +1818,7 @@
         "correct": false
       },
       {
-        "text": "Zasada włączania i wyłączania ma postać: $|\\bigcup_{i=1}^{n} A_i| = \\sum_{i=1}^{n} |A_i| - \\sum_{1 \\leq i < j \\leq n} |A_i \\cap A_j| + \\sum_{1 \\leq i < j < k \\leq n} |A_i \\cap A_j \\cap A_k| - ... + (-1)^{n-1} |A_1 \\cap A_2 \\cap ... \\cap A_n|$",
+        "text": "Zasada włączania i wyłączania ma postać:    $ \\left| \\bigcup_{i=1}^{n} A_i \\right| = \\sum_{i=1}^{n} |A_i| - \\sum_{1 \\leq i < j \\leq n} |A_i \\cap A_j| + \\sum_{1 \\leq i < j < k \\leq n} |A_i \\cap A_j \\cap A_k| - \\dots + (-1)^{n-1} |A_1 \\cap A_2 \\cap \\dots \\cap A_n|$",
         "correct": true
       },
       {
@@ -1730,10 +1838,10 @@
   },
   {
     "id": 31,
-    "question": "Poprawna pełna zasada włączania i wyłączania dla zbioru $N$ elementowego, którego pewne elementy spełniają własności $c_i, (i=1,2,3)$ ma postać:",
+    "question": "Poprawna pełna zasada włączania i wyłączania dla zbioru $N$ elementowego, którego pewne elementy spełniają własności $c_i, (i = 1,2,3)$ ma postać:",
     "options": [
       {
-        "text": "$N(\\bar{c_1}\\bar{c_2}\\bar{c_3}) = N(c_1) + N(c_2) + N(c_3)$",
+        "text": "$N(c_1 \\vee c_2 \\vee c_3) = N(c_1) + N(c_2) + N(c_3)$",
         "correct": false
       },
       {
@@ -1741,11 +1849,11 @@
         "correct": false
       },
       {
-        "text": "$N(\\bar{c_1}\\bar{c_2}\\bar{c_3}) = N(c_1) + N(c_2) + N(c_3) - N(c_1 c_2) - N(c_1 c_3) - N(c_2 c_3) + N(c_1 c_2 c_3)$",
+        "text": "$N(\\overline{c_1} \\overline{c_2} \\overline{c_3}) = N(c_1) + N(c_2) + N(c_3) - N(c_1 c_2) - N(c_1 c_3) - N(c_2 c_3) + N(c_1 c_2 c_3)$",
         "correct": false
       },
       {
-        "text": "$N(\\bar{c_1}\\bar{c_2}\\bar{c_3}) = N - N(c_1) - N(c_2) - N(c_3) + N(c_1 c_2) + N(c_1 c_3) + N(c_2 c_3) - N(c_1 c_2 c_3)$",
+        "text": "$N(\\overline{c_1} \\overline{c_2} \\overline{c_3}) = N - N(c_1) - N(c_2) - N(c_3) + N(c_1 c_2) + N(c_1 c_3) + N(c_2 c_3) - N(c_1 c_2 c_3)$",
         "correct": true
       },
       {
@@ -1760,7 +1868,7 @@
     "question": "Zaznacz zdanie prawdziwe:",
     "options": [
       {
-        "text": "Zasada szufladkowa Dirichleta mówi, że jeśli skończony zbiór $S$ jest podzielony na $k$ rozłącznych niepustych podzbiorów, to co najwyżej jeden z tych podzbiorów zawiera $\\lceil |S|/k \\rceil$ elementów lub więcej.",
+        "text": "Zasada szufladkowa Dirichleta mówi, że jeśli skończony zbiór $S$ jest podzielony na $k$ rozłącznych niepustych podzbiorów, to co najwyżej jeden z tych podzbiorów zawiera $\\lceil \\frac{|S|}{k} \\rceil$ elementów lub więcej.",
         "correct": false
       },
       {
@@ -1768,15 +1876,15 @@
         "correct": false
       },
       {
-        "text": "\\\"Klasyczna\\\" zasada szufladkowa dotyczy podziału zbioru $S$ na dwa zbiory, a uogólniona zasada szufladkowa dotyczy podziału na dowolną liczbę zbiorów.",
+        "text": "„Klasyczna” zasada szufladkowa dotyczy podziału zbioru $S$ na dwa zbiory, a uogólniona zasada szufladkowa dotyczy podziału na dowolną liczbę zbiorów.",
         "correct": false
       },
       {
-        "text": "Uogólniona zasada szufladkowa Dirichleta mówi, że jeśli skończony zbiór $S$ jest podzielony na $k$ podzbiorów $A_1, A_2, ..., A_k$, takich że każdy element $S$ należy do co najmniej $p$ spośród tych podzbiorów, to średnia liczność zbiorów $A_i$ wynosi co najmniej $\\frac{p|S|}{k}$.",
+        "text": "Uogólniona zasada szufladkowa Dirichleta mówi, że jeśli skończony zbiór $S$ jest podzielony na $k$ podzbiorów $A_1, A_2, ..., A_k$, takich że każdy element $S$ należy do co najmniej $p$ spośród tych podzbiorów, to średnia liczność zbiorów $A_i$ wynosi co najmniej $\\frac{p |S|}{k}$.",
         "correct": true
       },
       {
-        "text": "Z uogólnionej zasady szufladkowej Dirichleta wynika, że jeśli skończony zbiór $S$ jest podzielony na $k$ podzbiorów $A_1, A_2, ..., A_k$, takich że każdy element $S$ należy do dokładnie $t$ spośród tych podzbiorów, to średnia liczność zbiorów $A_i$ wynosi dokładnie $\\frac{k|S|}{t}$.",
+        "text": "Z uogólnionej zasady szufladkowej Dirichleta wynika, że jeśli skończony zbiór $S$ jest podzielony na $k$ podzbiorów $A_1, A_2, ..., A_k$, takich że każdy element $S$ należy do dokładnie $t$ spośród tych podzbiorów, to średnia liczność zbiorów $A_i$ wynosi dokładnie $\\frac{k |S|}{t}$.",
         "correct": false
       }
     ],
@@ -1818,7 +1926,7 @@
         "correct": true
       },
       {
-        "text": "Rozszerzenie prostokąta łacińskiego $p \\times q$ do kwadratu $n \\times n$ jest możliwe tylko wówczas, jeśli liczba wystąpień poszczególnych elementów spełnia warunek $L(i) > p + q - n$ dla każdego $i = 1, ..., n$.",
+        "text": "Rozszerzenie prostokąta łacińskiego $p \\times q$ do kwadratu $n \\times n$ jest możliwe tylko wówczas, jeśli liczba wystąpień poszczególnych elementów spełnia warunek $l(i) > p + q - n$ dla każdego $i = 1, ..., n$.",
         "correct": false
       },
       {
@@ -1826,11 +1934,11 @@
         "correct": false
       },
       {
-        "text": "Prostokąt łaciński $p \\times q$ rozbudowuje się do kwadratu łacińskiego $n \\times n$ przez dopisanie najpierw $(n-p)$ wierszy zbudowanych z dowolnej transwersali, a następnie $(n-q)$ kolumn zbudowanych ze specyficznej transwersali zawierającej zbiór $P$.",
+        "text": "Prostokąt łaciński $p \\times q$ rozbudowuje się do kwadratu łacińskiego $n \\times n$ przez dopisanie najpierw $(n - p)$ wierszy zbudowanych z dowolnej transwersali, a następnie $(n - q)$ kolumn zbudowanych ze specyficznej transwersali zawierającej zbiór $P$.",
         "correct": false
       },
       {
-        "text": "Dla $n$ będącego liczbą pierwszą lub potęgą liczby pierwszej istnieje co najwyżej $n-1$ wzajemnie ortogonalnych kwadratów łacińskich o wymiarze $n \\times n$, a dla pozostałych wartości $n$ istnieje dokładnie $n-1$ wzajemnie ortogonalnych kwadratów łacińskich o wymiarze $n \\times n$.",
+        "text": "Dla $n$ będącego liczbą pierwszą lub potęgą liczby pierwszej istnieje co najwyżej $n - 1$ wzajemnie ortogonalnych kwadratów łacińskich o wymiarze $n \\times n$, a dla pozostałych wartości $n$ istnieje dokładnie $n - 1$ wzajemnie ortogonalnych kwadratów łacińskich o wymiarze $n \\times n$.",
         "correct": false
       }
     ],
@@ -1838,26 +1946,26 @@
   },
   {
     "id": 35,
-    "question": "Zaznacz obiekt nie będący prostokątem łacińskim ze zbioru $\\{1, ..., 6\\}$:",
+    "question": "Zaznacz obiekt nie będący prostokątem łacińskim ze zbioru $\\{1,\\ldots,6\\}$:",
     "options": [
       {
-        "text": "$[1,2,3,4,5,6]$",
+        "text": "$[1, 2, 3, 4, 5, 6]$",
         "correct": false
       },
       {
-        "text": "Macierz 2x6 bez powtórzeń w wierszach i kolumnach",
+        "text": "$\\begin{bmatrix}2 & 1 \\\\3 & 4 \\\\5 & 6 \\\\1 & 2 \\\\6 & 3 \\\\4 & 5\\end{bmatrix}$",
         "correct": false
       },
       {
-        "text": "Macierz 3x3 bez powtórzeń w wierszach i kolumnach",
+        "text": "$\\begin{bmatrix}3 & 1 & 2 \\\\2 & 3 & 1 \\\\1 & 2 & 6\\end{bmatrix}$",
         "correct": false
       },
       {
-        "text": "Macierz z powtórzeniami w kolumnie",
+        "text": "$\\begin{bmatrix}1 & 2 & 3 & 4 & 5 & 6 \\\\6 & 5 & 4 & 3 & 2 & 1 \\\\5 & 4 & 3 & 2 & 1 & 6 \\\\4 & 3 & 2 & 1 & 6 & 5 \\\\3 & 6 & 5 & 1 & 3 & 4\\end{bmatrix}$",
         "correct": true
       },
       {
-        "text": "Macierz z powtórzeniami w wierszu",
+        "text": "$\\begin{bmatrix}6 & 5 & 4 & 3 \\\\3 & 1 & 5 & 1 \\\\1 & 3 & 2 & 6 \\\\2 & 3 & 5 & 1\\end{bmatrix}$",
         "correct": true
       }
     ],
@@ -1868,7 +1976,7 @@
     "question": "Zaznacz zdanie prawdziwe.",
     "options": [
       {
-        "text": "Wielomian szachowy $r_B(x) = 1 + r_1 x + r_2 x^2 + ... + r_k x^k + ... + r_n x^n$, to funkcja tworząca, której współczynniki $r_k$ oznaczają liczbę możliwych rozmieszczeń $k$ wzajemnie nieatakujących się wież na szachownicy $B$ o wymiarze $n \\times n$.",
+        "text": "Wielomian szachowy $r_B(x) = 1 + r_1x + r_2x^2 + ... + r_kx^k + ... + r_nx^n$, to funkcja tworząca, której współczynniki $r_k$ oznaczają liczbę możliwych rozmieszczeń $k$ wzajemnie nie atakujących się wież na szachownicy $B$ o wymiarze $n \\times n$.",
         "correct": true
       },
       {
@@ -1876,11 +1984,11 @@
         "correct": false
       },
       {
-        "text": "Każdą szachownicę $B$ można zdekomponować na dwie inne szachownice $B_1$ i $B_2$, takie że w $B_1$ zabroniona jest kolumna, a w $B_2$ wiersz, zawierające pewne dowolnie wybrane pole $s$.",
+        "text": "Każdą szachownicę $B$ można zdekomponować na dwie inne szachownice $B^1$ i $B^2$, takie że w $B^1$ zabroniona jest kolumna, a w $B^2$ wiersz, zawierające pewne dowolnie wybrane pole $s$.",
         "correct": false
       },
       {
-        "text": "Jeśli szachownica $B$ składa się z dwóch niezależnych obszarów $B_1$ i $B_2$, to wówczas $r_B(x)$ jest sumą wielomianów szachowych obszarów $B_1$ i $B_2$.",
+        "text": "Jeśli szachownica $B$ składa się z dwóch niezależnych obszarów $B^1$ i $B^2$, to wówczas $r_B(x)$ jest sumą wielomianów szachowych obszarów $B^1$ i $B^2$.",
         "correct": false
       },
       {
@@ -1892,7 +2000,7 @@
   },
   {
     "id": 37,
-    "question": "Zaznacz funkcję tworzącą, która może być wielomianem szachowym pewnej szachownicy o wymiarze $5 \\times 5$:",
+    "question": "Zaznacz funkcję tworzącą, która może być wielomianem szachowym pewnej szachownicy o wymiarze 5×5:",
     "options": [
       {
         "text": "$r_B(x) = 1 + 15x + 75x^2 + 145x^3 + 96x^4 + 12x^5$",
@@ -1922,7 +2030,7 @@
     "question": "Niech $A, B$ i $C$ będą podzbiorami pewnej przestrzeni $U$. Wśród poniższych zdań wskaż prawa algebry zbiorów.",
     "options": [
       {
-        "text": "$\\overline{A \\cap B} = \\bar{A} \\cap \\bar{B}$",
+        "text": "$\\overline{A \\cap B} = \\overline{A} \\cap \\overline{B}$",
         "correct": false
       },
       {
@@ -1934,11 +2042,11 @@
         "correct": true
       },
       {
-        "text": "$\\overline{A \\cup B} = \\bar{A} \\cup \\bar{B}$",
+        "text": "$\\overline{A \\cup B} = \\overline{A} \\cup \\overline{B}$",
         "correct": false
       },
       {
-        "text": "$\\overline{A \\cup B} = A \\cap \\bar{B}$",
+        "text": "$\\overline{A \\cup B} =  \\overline{A \\cap B}$",
         "correct": false
       }
     ],
@@ -1946,26 +2054,26 @@
   },
   {
     "id": 39,
-    "question": "Zaznacz wszystkie zdania prawdziwe dotyczące relacji liniowo porządkującej:",
+    "question": "Zaznacz wszystkie zdania prawdziwe.",
     "options": [
       {
-        "text": "Relacja liniowo porządkująca jest relacją zwrotną, antysymetryczną i przechodnią, w której każde dwa elementy są porównywalne.",
+        "text": "Relację, która jest jednocześnie relacją przechodnią, symetryczną i spójną w zbiorze $X$ nazywamy relacją liniowo porządkującą zbiór $X$.",
         "correct": false
       },
       {
-        "text": "Relacja liniowo porządkująca jest relacją zwrotną, symetryczną i przechodnią.",
+        "text": "Relację, która jest jednocześnie relacją przechodnią, symetryczną i przeciwzwrotną w zbiorze $X$ nazywamy relacją liniowo porządkującą zbiór $X$.",
         "correct": false
       },
       {
-        "text": "Każda relacja częściowego porządku jest relacją liniowego porządku.",
+        "text": "Relację, która jest jednocześnie relacją przechodnią, antysymetryczną i spójną w zbiorze $X$ nazywamy relacją liniowo porządkującą zbiór $X$.",
         "correct": false
       },
       {
-        "text": "Relacja podzielności w zbiorze liczb naturalnych jest relacją liniowego porządku.",
+        "text": "Relację, która jest jednocześnie relacją zwrotną, antysymetryczną i spójną w zbiorze $X$ nazywamy relacją liniowo porządkującą zbiór $X$.",
         "correct": false
       },
       {
-        "text": "Relacja zawierania zbiorów jest relacją liniowego porządku.",
+        "text": "Relację, która jest jednocześnie relacją zwrotną, przechodnią i antysymetryczną w zbiorze $X$ nazywamy relacją liniowo porządkującą zbiór $X$.",
         "correct": false
       }
     ],
@@ -1973,12 +2081,8 @@
   },
   {
     "id": 40,
-    "question": "Wśród poniższych zdań wskaż definicje słowa i języka:",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania będące definicjami odpowiednich obiektów:",
     "options": [
-      {
-        "text": "Słowem danego alfabetu $\\Sigma$ jest dowolny nieskończony ciąg liter zbioru $\\Sigma$.",
-        "correct": false
-      },
       {
         "text": "Słowem danego alfabetu $\\Sigma$ jest dowolny skończony ciąg liter zbioru $\\Sigma$.",
         "correct": true
@@ -1988,11 +2092,15 @@
         "correct": true
       },
       {
-        "text": "Językiem nad alfabetem $\\Sigma$ jest wyłącznie zbiór $\\Sigma^*$ zawierający wszystkie słowa zbudowane z liter alfabetu $\\Sigma$.",
+        "text": "Językiem nad alfabetem $\\Sigma$ jest zbiór potęgowy zbioru $\\Sigma$.",
         "correct": false
       },
       {
-        "text": "Słowo puste nie jest słowem żadnego alfabetu.",
+        "text": "Słowem danego alfabetu $\\Sigma$ jest dowolny skończony ciąg liter zbioru $\\Sigma$, który zawiera co najwyżej jedno wystąpienie każdego z elementów zbioru $\\Sigma$.",
+        "correct": false
+      },
+      {
+        "text": "Jeżeli przez $\\Sigma^*$ oznaczymy zbiór wszystkich słów zbudowanych z liter alfabetu $\\Sigma$, to językiem nad alfabetem $\\Sigma$ jest $\\Sigma^* \\times \\Sigma^*$.",
         "correct": false
       }
     ],
@@ -2000,26 +2108,26 @@
   },
   {
     "id": 41,
-    "question": "Niech $G=(V,E)$ będzie grafem i $X,Y \\subseteq V$. Zaznacz zdanie prawdziwe:",
+    "question": "Niech $G=(V,E)$ będzie dowolnym grafem i niech $X,Y \\subseteq V$. Wśród poniższych zdań wskaż wszystkie zdania prawdziwe.",
     "options": [
-      {
-        "text": "Minimalna liczba wierzchołków, które rozdzielają $X$ od $Y$ równa jest minimalnej liczbie rozłącznych ścieżek z $X$ do $Y$.",
-        "correct": false
-      },
       {
         "text": "Minimalna liczba wierzchołków, które rozdzielają $X$ od $Y$ równa jest maksymalnej liczbie rozłącznych ścieżek z $X$ do $Y$.",
         "correct": true
       },
       {
-        "text": "Maksymalna liczba wierzchołków, które rozdzielają $X$ od $Y$ równa jest maksymalnej liczbie rozłącznych ścieżek z $X$ do $Y$.",
+        "text": "Minimalna liczba wierzchołków, które rozdzielają $X$ od $Y$ równa jest minimalnej liczbie rozłącznych ścieżek z $X$ do $Y$.",
         "correct": false
       },
       {
-        "text": "Minimalna liczba wierzchołków, które rozdzielają $X$ od $Y$ jest zawsze równa 1.",
+        "text": "Minimalna liczba wierzchołków, które rozdzielają $X$ od $Y$ równa jest liczności zbioru $X$.",
         "correct": false
       },
       {
-        "text": "Nie istnieje związek między liczbą wierzchołków rozdzielających $X$ od $Y$ a liczbą rozłącznych ścieżek.",
+        "text": "Minimalna liczba wierzchołków, które rozdzielają $X$ od $Y$ równa jest liczności zbioru $Y$.",
+        "correct": false
+      },
+      {
+        "text": "Minimalna liczba wierzchołków, które rozdzielają $X$ od $Y$ równa jest $\\min{|X|, |Y|}$.",
         "correct": false
       }
     ],
@@ -2027,10 +2135,14 @@
   },
   {
     "id": 42,
-    "question": "Obiekty $\\{A,C,D,E\\}$ i $\\{B,E,F,F\\}$ ze zbioru $\\{A,B,C,D,E,F\\}$ są przykładem:",
+    "question": "Obiekty $|A, C, D, E|$ i $|B, E, F, F|$ utworzono ze zbioru $\\{A, B, C, D, E, F\\}$. Kolejność tych obiektów oraz uporządkowanie ich elementów nie są istotne. Obiekty te są przykładem:",
     "options": [
       {
-        "text": "dwóch 4-elementowych kombinacji bez powtórzeń ze zbioru 6-elementowego.",
+        "text": "podziału uporządkowanego zbioru $\\{A, B, C, D, E, F\\}$ ponieważ elementy w obiektach są ustawione alfabetycznie.",
+        "correct": false
+      },
+      {
+        "text": "podziału zbioru $\\{A, B, C, D, E, F\\}$ na dwa podzbiory.",
         "correct": false
       },
       {
@@ -2038,26 +2150,26 @@
         "correct": false
       },
       {
-        "text": "dwóch 4-elementowych kombinacji z powtórzeniami ze zbioru 6-elementowego.",
-        "correct": true
-      },
-      {
         "text": "dwóch 4-elementowych permutacji bez powtórzeń ze zbioru 6-elementowego.",
         "correct": false
       },
       {
-        "text": "dwóch 4-elementowych wariacji z powtórzeniami ze zbioru 6-elementowego.",
-        "correct": false
+        "text": "dwóch 4-elementowych kombinacji z powtórzeniami ze zbioru 6-elementowego.",
+        "correct": true
       }
     ],
     "multiple": false
   },
   {
     "id": 43,
-    "question": "Zaznacz zdania prawdziwe dotyczące kombinacji bez powtórzeń:",
+    "question": "Zaznacz zdania prawdziwe.",
     "options": [
       {
-        "text": "Z każdej $k$-elementowej kombinacji bez powtórzeń ze zbioru $n$-elementowego można utworzyć $(k-1)!$ różnych $k$-wyrazowych wariacji bez powtórzeń ze zbioru $n$-elementowego.",
+        "text": "Wszystkie $k$-elementowe kombinacje bez powtórzeń z $n$-elementowego zbioru, dla $k=0, \\ldots, n$, mogą być wygenerowane za pomocą generacji ze wszystkich liczb binarnych z zakresu od $1$ do $2^n$.",
+        "correct": false
+      },
+      {
+        "text": "Każde rozmieszczenie $k$ identycznych elementów w $n$ rozróżnialnych pudełkach odpowiada $k$-elementowej kombinacji bez powtórzeń ze zbioru $n$-elementowego.",
         "correct": false
       },
       {
@@ -2065,15 +2177,11 @@
         "correct": true
       },
       {
-        "text": "Liczba $k$-elementowych kombinacji bez powtórzeń ze zbioru $n$-elementowego wynosi $\\frac{n!}{k!}$.",
+        "text": "Liczba wszystkich $k$-elementowych kombinacji bez powtórzeń z $n$-elementowego zbioru wynosi $\\binom{n}{k}$ gdzie $n \\leq k$ lub $k < n$",
         "correct": false
       },
       {
-        "text": "Każda $k$-elementowa kombinacja bez powtórzeń ze zbioru $n$-elementowego jest zbiorem $k$ różnych elementów.",
-        "correct": false
-      },
-      {
-        "text": "Kombinacja bez powtórzeń to uporządkowany ciąg elementów.",
+        "text": "Każda $k$-elementowa kombinacja bez powtórzeń ze zbioru $n$-elementowego odpowiada pewnemu podziałowi tego zbioru na $k$ podzbiorów.",
         "correct": false
       }
     ],
@@ -2081,18 +2189,14 @@
   },
   {
     "id": 44,
-    "question": "Do 7 rozróżnialnych pudełek można wrzucić 4 identyczne elementy na:",
+    "question": "Do 7 rozróżnialnych pudełek można wrzucić (w dowolny sposób) 4 identyczne elementy na",
     "options": [
       {
-        "text": "$7^4$ sposobów.",
-        "correct": false
-      },
-      {
-        "text": "$4^7$ sposobów.",
-        "correct": false
-      },
-      {
         "text": "$\\binom{7}{4}$ sposobów.",
+        "correct": false
+      },
+      {
+        "text": "$7^4$ sposobów.",
         "correct": false
       },
       {
@@ -2100,7 +2204,11 @@
         "correct": true
       },
       {
-        "text": "$\\frac{7!}{4!}$ sposobów.",
+        "text": "$4^7$ sposobów.",
+        "correct": false
+      },
+      {
+        "text": "$\\frac{7!}{(7-4)!}$ sposobów.",
         "correct": false
       }
     ],
@@ -2108,10 +2216,18 @@
   },
   {
     "id": 45,
-    "question": "Zaznacz zdania prawdziwe dotyczące permutacji z powtórzeniami:",
+    "question": "Zaznacz zdania prawdziwe.",
     "options": [
       {
-        "text": "Liczba $k$-wyrazowych permutacji z powtórzeniami jest nie mniejsza niż liczba $k$-wyrazowych permutacji bez powtórzeń.",
+        "text": "$k$-wyrazową permutacją z powtórzeniami ze zbioru $n$-elementowego nazywamy każdy $k$-wyrazowy ciąg mogących się powtarzać elementów tego zbioru.",
+        "correct": false
+      },
+      {
+        "text": "Permutacja z powtórzeniami może być interpretowana jako dowolne rozmieszczenie $n$ rozróżnialnych obiektów w $k$ rozróżnialnych pudełkach.",
+        "correct": false
+      },
+      {
+        "text": "$k$-wyrazowe permutacje z powtórzeniami są równoważne $k$-wyrazowym wariacjom z powtórzeniami.",
         "correct": false
       },
       {
@@ -2119,15 +2235,7 @@
         "correct": true
       },
       {
-        "text": "Permutacja z powtórzeniami to dowolny ciąg elementów ze zbioru $n$-elementowego.",
-        "correct": false
-      },
-      {
-        "text": "Liczba permutacji z powtórzeniami zależy wyłącznie od liczby elementów zbioru.",
-        "correct": false
-      },
-      {
-        "text": "Permutacja z powtórzeniami jest tym samym co wariacja z powtórzeniami.",
+        "text": "W $n$-elementowej permutacji z powtórzeniami ze zbioru $\\{a_1, \\dots, a_n\\}$, w której element $a_i$ powtarza się $n_i$ razy, dla $i = 1, \\dots, k$, zachodzi: $\\sum_{i=1}^{k}{n_i=n!}$.",
         "correct": false
       }
     ],
@@ -2135,26 +2243,26 @@
   },
   {
     "id": 46,
-    "question": "Zaznacz zdania prawdziwe dotyczące zależności rekurencyjnych:",
+    "question": "Zaznacz zdania prawdziwe.",
     "options": [
       {
-        "text": "Rozwiązanie problemu wież z Hanoi, $T_n = 2T_{n-1} + 1$, $n > 0$, $T_0 = 0$, jest przykładem jednorodnej liniowej zależności rekurencyjnej rzędu pierwszego ze stałymi współczynnikami.",
+        "text": "Rozwiązanie liniowej jednorodnej zależności rekurencyjnej rzędu pierwszego ze stałymi współczynnikami postaci $a_{n+1} + ca_n = 0$ jest dane wzorem $a_n = ca_0^n$, gdzie $c$ oznacza pewną stałą i $n \\in \\mathbb{N}$.",
         "correct": false
       },
       {
-        "text": "Rozwiązanie problemu wież z Hanoi, $T_n = 2T_{n-1} + 1$, $n > 0$, $T_0 = 0$, jest przykładem niejednorodnej liniowej zależności rekurencyjnej rzędu pierwszego ze stałymi współczynnikami.",
+        "text": "Rozwiązanie zależności liniowej jednorodnej rzędu drugiego ze stałymi współczynnikami o równaniu charakterystycznym o jednym pierwiastku podwójnym ma postać $a_n = c_1 r^n + c_2 n r^n$, gdzie wartości stałych $c_1$ i $c_2$ są wyznaczane w oparciu o początkowe elementy ciągu.",
+        "correct": false
+      },
+      {
+        "text": "Rozwiązanie problemu wież z Hanoi, $T_n = 2T_{n-1} + 1, n > 0, T_0 = 0$, jest przykładem niejednorodnej liniowej zależności rekurencyjnej rzędu pierwszego ze stałymi współczynnikami.",
         "correct": true
       },
       {
-        "text": "Rozwiązanie problemu wież z Hanoi wymaga zastosowania metody równania charakterystycznego.",
+        "text": "Zależność postaci $c_n a_n + c_{n-1} a_{n-1} + \\dots + c_k a_k = 0$, gdzie $c_i$ dla $i = n, \\dots, k$ są pewnymi stałymi rzeczywistymi, $c_n \\neq 0$ i $c_k \\neq 0$ nazywamy liniową jednorodną zależnością rekurencyjną rzędu k-tego ze stałymi współczynnikami.",
         "correct": false
       },
       {
-        "text": "Problem wież z Hanoi opisuje zależność rekurencyjna rzędu drugiego.",
-        "correct": false
-      },
-      {
-        "text": "Zależność $T_n = 2T_{n-1} + 1$ jest zależnością nieliniową.",
+        "text": "Każdy pierwiastek pojedynczy $r$ równania charakterystycznego wprowadza do rozwiązania liniowej jednorodnej zależności rekurencyjnej ze stałymi współczynnikami rzędu $k \\geq 2$ czynnik $rc^n$, gdzie $c$ jest pewną stałą, którą można wyznaczyć w oparciu o początkowe wyrazy ciągu.",
         "correct": false
       }
     ],
@@ -2162,26 +2270,26 @@
   },
   {
     "id": 47,
-    "question": "Zależność $(a_0=0, a_1=3, a_2=4, a_{n+1}+3a_{n-2}=3^n$ dla $n \\geq 2)$ jest:",
+    "question": "Zależność rekurencyjna $\\{a_0 = 0, a_1 = 3, a_2 = 4, a_{n+1}+3a_{n-2} = 3n \\text{ dla } n \\geq 2\\}$ jest zależnością rekurencyjną liniową ze stałymi współczynnikami:",
     "options": [
       {
-        "text": "liniową ze stałymi współczynnikami rzędu drugiego jednorodną.",
+        "text": "rzędu drugiego jednorodną,",
         "correct": false
       },
       {
-        "text": "liniową ze stałymi współczynnikami rzędu trzeciego jednorodną.",
+        "text": "rzędu drugiego niejednorodną,",
         "correct": false
       },
       {
-        "text": "liniową ze stałymi współczynnikami rzędu trzeciego niejednorodną.",
+        "text": "rzędu trzeciego jednorodną,",
+        "correct": false
+      },
+      {
+        "text": "rzędu trzeciego niejednorodną,",
         "correct": true
       },
       {
-        "text": "liniową ze stałymi współczynnikami rzędu drugiego niejednorodną.",
-        "correct": false
-      },
-      {
-        "text": "nieliniową zależnością rekurencyjną.",
+        "text": "rzędu $(n+1)$-szego jednorodną.",
         "correct": false
       }
     ],
@@ -2189,26 +2297,26 @@
   },
   {
     "id": 48,
-    "question": "Zależność $(a_0=1, a_1=2, na_n = 3a_{n-1} \\cdot a_{n-2} = 0$ dla $n \\geq 2)$ jest:",
+    "question": "Zależność rekurencyjna $\\{a_0 = 1, a_1 = 2, na_n = 3a_{n-1}\\cdot a_{n-2}=0 \\text{ dla } n \\geq 2\\}$ jest zależnością:",
     "options": [
       {
-        "text": "liniową ze stałymi współczynnikami rzędu drugiego.",
+        "text": "niejednorodną,",
         "correct": false
       },
       {
-        "text": "liniową ze zmiennymi współczynnikami rzędu drugiego.",
+        "text": "dla której równanie charakterystyczne jest równaniem kwadratowym,",
         "correct": false
       },
       {
-        "text": "która może być rozwiązana metodą równania charakterystycznego.",
+        "text": "o stałych współczynnikach,",
         "correct": false
       },
       {
-        "text": "która nie może być rozwiązana metodą równania charakterystycznego.",
+        "text": "która nie może być rozwiązana metodą równania charakterystycznego,",
         "correct": true
       },
       {
-        "text": "jednorodną zależnością rekurencyjną.",
+        "text": "dla której równanie charakterystyczne jest równaniem stopnia trzeciego.",
         "correct": false
       }
     ],
@@ -2216,26 +2324,26 @@
   },
   {
     "id": 49,
-    "question": "Zaznacz zdania prawdziwe dotyczące pierwszej zasady indukcji matematycznej:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Pierwsza zasada indukcji matematycznej dla $n_0=1$ ma postać: $[(\\forall k \\geq 1 [S(k) \\Rightarrow S(k+1)]) \\land S(1)] \\Rightarrow \\forall n \\in \\mathbb{Z}^+ S(n)$.",
+        "text": "Pierwsza zasada indukcji matematycznej dla pewnego $n_0 \\in \\mathbb{Z}^{+}$ ma postać: $[S(n_0) \\land [\\forall_{k \\geq 1} [S(k) \\implies S(k+1)]]] \\implies \\forall_{n \\geq 1} S(n)$.",
+        "correct": false
+      },
+      {
+        "text": "Pierwszą zasadę indukcji matematycznej stosuje się do dowodzenia twierdzeń, w których prawdziwość pewnego zdania wynika z prawdziwości jednego, dowolnego ze zdań poprzedzających.",
+        "correct": false
+      },
+      {
+        "text": "Pierwsza zasada indukcji matematycznej dla $n_0 = 1$ ma postać: $[(\\forall_{k \\geq 1} [S(k) \\implies S(k + 1)]) \\land S(1)] \\implies \\forall_{n \\in \\mathbb{Z}^{+}} S(n)$.",
         "correct": true
       },
       {
-        "text": "W pierwszej zasadzie indukcji krok indukcyjny wymaga dowodu prawdziwości $S(k)$ dla konkretnego $k$.",
+        "text": "Zasada indukcji matematycznej może być wykorzystana do dowodzenia twierdzeń dotyczących dowolnych liczb dodatnich.",
         "correct": false
       },
       {
-        "text": "Pierwsza zasada indukcji może być stosowana wyłącznie gdy $n_0 = 1$.",
-        "correct": false
-      },
-      {
-        "text": "Warunek początkowy w pierwszej zasadzie indukcji wymaga dowodu $S(n)$ dla wszystkich $n \\geq n_0$.",
-        "correct": false
-      },
-      {
-        "text": "Pierwsza zasada indukcji jest równoważna drugiej zasadzie indukcji.",
+        "text": "Jeśli pewne twierdzenie $\\forall_{n \\in \\mathbb{Z}^{+}} S(n)$ nie jest prawdziwe dla pewnych początkowych wartości $n \\geq 1$, to może ono być udowodnione z wykorzystaniem drugiej zasady indukcji matematycznej.",
         "correct": false
       }
     ],
@@ -2243,37 +2351,37 @@
   },
   {
     "id": 50,
-    "question": "Zaznacz zdania prawdziwe dotyczące drugiej zasady indukcji matematycznej:",
+    "question": "Zaznacz zdania prawdziwe.",
     "options": [
       {
-        "text": "Druga zasada indukcji matematycznej wymaga dowodu prawdziwości $S(n)$ dla wszystkich $n$ jednocześnie.",
+        "text": "Pierwsza i druga zasada indukcji matematycznej są sobie równoważne tylko dla pewnego rodzaju twierdzeń.",
+        "correct": false
+      },
+      {
+        "text": "Dowód kroku indukcyjnego w pierwszej zasadzie indukcji matematycznej wymaga wykazania prawdziwości zdania $S(k)$ i prawdziwości zdania $S(k+1)$ dla pewnej liczby $k \\geq 1$.",
+        "correct": false
+      },
+      {
+        "text": "Dowód pierwszej zasady indukcji matematycznej nie dowodzi poprawności drugiej zasady indukcji matematycznej, ponieważ jest ona inaczej sformułowana.",
+        "correct": false
+      },
+      {
+        "text": "Pierwszą zasadę indukcji matematycznej stosuje się do dowodzenia twierdzeń, w których prawdziwość pewnego zdania wynika z prawdziwości jednego ze zdań poprzedzających.",
         "correct": false
       },
       {
         "text": "Drugą zasadę indukcji matematycznej można zastosować do dowodzenia twierdzeń dotyczących liczb całkowitych dodatnich, w których prawdziwość zdania $S(n)$ dla $n=k+1$ wynika z prawdziwości kilku zdań poprzedzających.",
         "correct": true
-      },
-      {
-        "text": "Druga zasada indukcji jest słabsza od pierwszej zasady indukcji.",
-        "correct": false
-      },
-      {
-        "text": "W drugiej zasadzie indukcji warunek początkowy zawsze dotyczy tylko jednego elementu.",
-        "correct": false
-      },
-      {
-        "text": "Druga zasada indukcji nie może być stosowana do dowodzenia własności ciągów rekurencyjnych.",
-        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 51,
-    "question": "Zaznacz zdania prawdziwe dotyczące liczb Stirlinga:",
+    "question": "Zaznacz zdania prawdziwe.",
     "options": [
       {
-        "text": "Liczby Stirlinga drugiego rodzaju są zawsze większe niż liczby Stirlinga pierwszego rodzaju dla tych samych parametrów.",
+        "text": "Definicja rekurencyjna liczb Stirlinga drugiego rodzaju zawiera zależność postaci: $S(n, k) = S(n-1, k) + k S(n-1, k-1)$, a definicja rekurencyjna liczb Stirlinga pierwszego rodzaju: $s(n, k) = s(n-1, k) + (n-1) s(n-1, k-1)$ (gdzie $n > k > 0$).",
         "correct": false
       },
       {
@@ -2281,15 +2389,15 @@
         "correct": true
       },
       {
-        "text": "Liczby Stirlinga pierwszego rodzaju dotyczą podziału zbioru na podzbiory.",
+        "text": "Liczby Eulera drugiego rzędu $\\left\\langle \\left\\langle \\begin{matrix} n \\\\ k \\end{matrix} \\right\\rangle \\right\\rangle$ oznaczają liczbę permutacji z powtórzeniami multizbioru $\\{1, 1, 2, 2, \\dots, k, k\\}$ zawierających $n$ wniesień.",
         "correct": false
       },
       {
-        "text": "Liczby Stirlinga drugiego rodzaju dotyczą rozmieszczenia elementów w cyklach.",
+        "text": "Liczby harmoniczne pierwszego rzędu tworzą ciąg zbieżny do pewnej granicy, ponieważ zgodnie z definicją rekurencyjną każda kolejna liczba $H_{n+1}$ powstaje z poprzedniej liczby $H_{n}$ przez dodanie ułamka $\\frac{1}{(n+1)}$.",
         "correct": false
       },
       {
-        "text": "Liczby Stirlinga są zawsze liczbami całkowitymi ujemnymi.",
+        "text": "W systemie liczbowym Fibonacciego, zbudowanym w oparciu o twierdzenie Zeckendorfa, do jednoznacznej reprezentacji liczb całkowitych dodatnich wykorzystuje się wszystkie liczby Fibonacciego $F_k$, dla $k \\geq 0$.",
         "correct": false
       }
     ],
@@ -2297,10 +2405,10 @@
   },
   {
     "id": 52,
-    "question": "Zaznacz zdania prawdziwe dotyczące permutacji i cykli:",
+    "question": "Zaznacz zdania prawdziwe.",
     "options": [
       {
-        "text": "Każdej $n$-elementowej permutacji bez powtórzeń ze zbioru $n$-elementowego odpowiada dokładnie jeden cykl.",
+        "text": "W ciągu liczby Stirlinga drugiego rodzaju mogą pojawić się liczby nie będące liczbami całkowitymi.",
         "correct": false
       },
       {
@@ -2308,15 +2416,15 @@
         "correct": true
       },
       {
-        "text": "Układ cykli permutacji jest jednoznaczny dla danej permutacji.",
+        "text": "Liczby harmoniczne rzędu $r$, dla $r > 1$, tworzą ciąg rozbieżny.",
         "correct": false
       },
       {
-        "text": "Permutacja identycznościowa nie ma reprezentacji cyklowej.",
+        "text": "Liczby Fibonacciego są liczbami opisanymi zależnością rekurencyjną rzędu trzeciego, ponieważ w definicji występują trzy elementy ciągu.",
         "correct": false
       },
       {
-        "text": "Liczba cykli w permutacji jest zawsze równa liczbie elementów zbioru.",
+        "text": "Liczby Eulera związane są z liczbą cykli Eulera w grafie.",
         "correct": false
       }
     ],
@@ -2324,14 +2432,14 @@
   },
   {
     "id": 53,
-    "question": "Pełna poprawna zasada włączania i wyłączania dla 4 zbiorów składa się z:",
+    "question": "Pełna poprawna zasada włączania i wyłączania dla 4 zbiorów jest formułą składającą się z:",
     "options": [
       {
-        "text": "4 składników.",
+        "text": "4 składników, ponieważ są 4 zbiory.",
         "correct": false
       },
       {
-        "text": "8 składników.",
+        "text": "16 składników, ponieważ należy sprawdzić część wspólną każdego zbioru z każdym.",
         "correct": false
       },
       {
@@ -2339,11 +2447,11 @@
         "correct": true
       },
       {
-        "text": "16 składników.",
+        "text": "8 składników.",
         "correct": false
       },
       {
-        "text": "nieskończonej liczby składników.",
+        "text": "nieznanej liczby składników, ponieważ ich liczba zależy od liczności tych zbiorów.",
         "correct": false
       }
     ],
@@ -2351,26 +2459,26 @@
   },
   {
     "id": 54,
-    "question": "Zaznacz zdania prawdziwe dotyczące zasady włączania i wyłączania:",
+    "question": "Zaznacz zdania prawdziwe.",
     "options": [
       {
-        "text": "Dla zbioru $S$ i warunków $c_i$, $1 \\leq i \\leq t$, spełnionych przez pewne elementy ze zbioru $S$, liczba elementów, które nie spełniają żadnego z tych warunków wynosi: $N(\\bar{c_1}\\bar{c_2}...\\bar{c_t}) = |S| - \\sum_{1 \\leq i \\leq t} N(c_i) + \\sum_{1 \\leq i < j \\leq t} N(c_i c_j) - ... + (-1)^t N(c_1 c_2 ... c_t)$.",
+        "text": "Zasada włączania i wyłączania mówi, że liczba elementów pewnego zbioru $S$, $|S| = N$, które nie spełniają żadnego z warunków $c_i$, $1 \\leq i \\leq t$, jest równa $N = N - N(c_1) - N(c_2) - ... - N(c_t)$, gdzie $N(c_i)$ oznacza liczbę elementów $S$ spełniających warunek $c_i$.",
+        "correct": false
+      },
+      {
+        "text": "Zasada włączania i wyłączania w postaci alternatywnej dotyczy pewnego zbioru $S$, dla którego zdefiniowane są warunki $c_i$, $1 \\leq i \\leq t$, które muszą być spełnione przez wszystkie elementy zbioru $S$.",
+        "correct": false
+      },
+      {
+        "text": "Dla zbioru $S$ i warunków $c_i$, $1 \\leq i \\leq t$, spełnionych przez pewne elementy ze zbioru $S$, liczba elementów, które nie spełniają żadnego z tych warunków wynosi:  $N(\\overline{c_1} \\overline{c_2} ... \\overline{c_t}) = |S| - \\sum_{1 \\leq i \\leq t} N(c_i) + \\sum_{1 \\leq i < j \\leq t} N(c_i c_j) - \\sum_{1 \\leq i < j < k \\leq t} N(c_i c_j c_k) + \\dots + (-1)^t N(c_1 c_2 ... c_t)$.",
         "correct": true
       },
       {
-        "text": "Zasada włączania i wyłączania pozwala obliczyć liczbę elementów spełniających wszystkie warunki.",
+        "text": "Symbol $N(c_i c_j)$ występujący w zasadzie włączania i wyłączania oznacza liczbę elementów ze zbioru $S$ spełniających warunki $c_i$ i $c_j$ i równocześnie nie spełniających pozostałych warunków $c_k$, $(1 \\leq i, j, k \\leq t, k \\neq i, k \\neq j)$.",
         "correct": false
       },
       {
-        "text": "W zasadzie włączania i wyłączania wszystkie składniki mają znak dodatni.",
-        "correct": false
-      },
-      {
-        "text": "Zasada włączania i wyłączania wymaga znajomości wszystkich elementów zbioru.",
-        "correct": false
-      },
-      {
-        "text": "Zasada włączania i wyłączania dotyczy wyłącznie zbiorów dwuelementowych.",
+        "text": "Dowód zasady włączania i wyłączania w postaci alternatywnej jest oparty o prawa teorii mnogości.",
         "correct": false
       }
     ],
@@ -2378,26 +2486,26 @@
   },
   {
     "id": 55,
-    "question": "Zaznacz zdania prawdziwe dotyczące zasady szufladkowej:",
+    "question": "Zaznacz zdania prawdziwe.",
     "options": [
+      {
+        "text": "Zasada szufladkowa Dirichleta mówi, że jeśli skończony zbiór $S$ jest podzielony na $k$ rozłącznych niepustych podzbiorów, to każdy z tych podzbiorów zawiera $\\lceil |S| / k \\rceil$ elementów lub więcej.",
+        "correct": false
+      },
+      {
+        "text": "Dowód zasady szufladkowej Dirichleta wykorzystuje pojęcie uporządkowanego podziału zbioru.",
+        "correct": false
+      },
+      {
+        "text": "„Klasyczna” zasada szufladkowa Dirichleta w żaden sposób nie wynika z uogólnionej zasady szufladkowej Dirichleta, ponieważ dotyczy zbiorów o odmiennych własnościach.",
+        "correct": false
+      },
       {
         "text": "Z zasady szufladkowej Dirichleta wynika, że jeśli skończony zbiór $S$ jest podzielony na $k$ rozłącznych niepustych podzbiorów, to średnia liczność tych zbiorów wynosi $\\frac{|S|}{k}$.",
         "correct": true
       },
       {
-        "text": "Zasada szufladkowa mówi, że wszystkie szufladki mają taką samą liczbę elementów.",
-        "correct": false
-      },
-      {
-        "text": "Zasada szufladkowa dotyczy wyłącznie zbiorów nieskończonych.",
-        "correct": false
-      },
-      {
-        "text": "Z zasady szufladkowej wynika, że co najmniej jedna szufladka jest pusta.",
-        "correct": false
-      },
-      {
-        "text": "Zasada szufladkowa nie ma zastosowań w kombinatoryce.",
+        "text": "Uogólniona zasada szufladkowa Dirichleta określa wartość średniej arytmetycznej liczb elementów zbiorów $A_1, ..., A_k$ będących rozłącznymi podzbiorami pewnego skończonego zbioru $S$.",
         "correct": false
       }
     ],
@@ -2405,14 +2513,10 @@
   },
   {
     "id": 56,
-    "question": "Średnia liczność zbiorów $A_1, ..., A_6$ będących podzbiorami zbioru 18-elementowego $S$, takimi że każdy element $S$ należy do dokładnie 3 podzbiorów wynosi:",
+    "question": "Średnia liczność zbiorów $A_1, A_2, A_3, A_4, A_5, A_6$ będących podzbiorami zbioru 18-elementowego $S$, takimi, że każdy element $S$ należy do dokładnie 3 podzbiorów wynosi:",
     "options": [
       {
-        "text": "co najmniej 9.",
-        "correct": false
-      },
-      {
-        "text": "co najwyżej 9.",
+        "text": "nie może być określona.",
         "correct": false
       },
       {
@@ -2420,7 +2524,11 @@
         "correct": true
       },
       {
-        "text": "dokładnie 6.",
+        "text": "co najwyżej 9.",
+        "correct": false
+      },
+      {
+        "text": "co najmniej 9.",
         "correct": false
       },
       {
@@ -2432,26 +2540,26 @@
   },
   {
     "id": 57,
-    "question": "Zaznacz zdania prawdziwe dotyczące rozszerzania prostokąta łacińskiego:",
+    "question": "Zaznacz zdania prawdziwe.",
     "options": [
       {
         "text": "Rozszerzenie prostokąta łacińskiego $n \\times q$ do kwadratu $n \\times n$ jest zawsze możliwe i wymaga wyznaczenia transwersali rodziny zbiorów zawierających elementy nie występujące dotychczas w poszczególnych wierszach.",
         "correct": true
       },
       {
-        "text": "Rozszerzenie prostokąta łacińskiego jest możliwe tylko dla pewnych wymiarów.",
+        "text": "Każda macierz o wymiarze $p \\times q$ zbudowana z elementów ze zbioru $\\{1, \\dots, n\\}$, gdzie $\\min(p, q) < n$, w której w żadnym wierszu elementy się nie powtarzają jest prostokątem łacińskim.",
         "correct": false
       },
       {
-        "text": "Rozszerzenie prostokąta łacińskiego wymaga usunięcia niektórych elementów.",
+        "text": "Rozszerzenie dowolnego prostokąta łacińskiego o dodatkowe kolumny jest zawsze możliwe, należy jedynie w każdej nowej kolumnie umieszczać elementy występujące najrzadziej.",
         "correct": false
       },
       {
-        "text": "Prostokąt łaciński można rozszerzyć tylko przez dodanie wierszy, nie kolumn.",
+        "text": "Pewne prostokąty łacińskie $p \\times n$, w których liczba wystąpień niektórych elementów jest zbyt mała, nie mogą być rozszerzone do kwadratu łacińskiego $n \\times n$.",
         "correct": false
       },
       {
-        "text": "Rozszerzenie prostokąta łacińskiego jest operacją nieodwracalną.",
+        "text": "Kwadratem grecko-łacińskim, czyli kwadratem Eulera, nazywamy złożenie dwóch dowolnych kwadratów łacińskich o takim samym rozmiarze.",
         "correct": false
       }
     ],
@@ -2459,26 +2567,26 @@
   },
   {
     "id": 58,
-    "question": "Dany jest prostokąt łaciński. Zaznacz kolumnę, której nie można do niego dopisać (jeśli ma być rozszerzalny):",
+    "question": "Dany jest poniższy prostokąt łaciński $L$ ze zbioru $\\{1,6\\}$. Zaznacz kolumnę, której $\\textbf{nie można}$ dopisać do tego prostokąta, jeśli ma być nadal rozszerzalny do kwadratu łacińskiego $6 \\times 6$: $L =\\begin{pmatrix}2 & 3 & 4 & 6 \\\\4 & 5 & 3 & 1 \\\\3 & 4 & 6 & 2 \\\\5 & 6 & 1 & 4\\end{pmatrix}$",
     "options": [
       {
-        "text": "$[1,2,3,4]$",
+        "text": "$\\begin{matrix}5 \\\\2 \\\\1 \\\\3\\end{matrix}$",
         "correct": false
       },
       {
-        "text": "$[2,3,4,5]$",
+        "text": "$\\begin{matrix}1 \\\\2 \\\\5 \\\\3\\end{matrix}$",
         "correct": false
       },
       {
-        "text": "$[3,4,5,6]$",
-        "correct": false
-      },
-      {
-        "text": "$[5,6,1,3]$",
+        "text": "$\\begin{matrix}5 \\\\6 \\\\1 \\\\3\\end{matrix}$",
         "correct": true
       },
       {
-        "text": "$[4,5,6,1]$",
+        "text": "$\\begin{matrix}5 \\\\6 \\\\1 \\\\2\\end{matrix}$",
+        "correct": false
+      },
+      {
+        "text": "$\\begin{matrix}1 \\\\6 \\\\5 \\\\2\\end{matrix}$",
         "correct": false
       }
     ],
@@ -2486,26 +2594,26 @@
   },
   {
     "id": 59,
-    "question": "Zaznacz zdania prawdziwe dotyczące wielomianu szachowego:",
+    "question": "Zaznacz zdania prawdziwe.",
     "options": [
+      {
+        "text": "Wielomian szachowy $r_f(x) = 1 + r_1 x + r_2 x^2 + ... + r_k x^k + ... + r_n x^n$ to funkcja, której wartość oznacza liczbę możliwych rozmieszczeń $x$ wzajemnie atakujących się wież na szachownicy o wymiarze $n \\times n$.",
+        "correct": false
+      },
+      {
+        "text": "Szachownica $B$ składa się z dwóch niezależnych obszarów $C$ i $D$, to wówczas $r_f(x) = r_C(x) + x r_D(x)$.",
+        "correct": false
+      },
+      {
+        "text": "Dekompzycja wielomianów szachowych jest możliwa tylko i wyłącznie wówczas, jeśli daną szachownicę można podzielić na dwa rozłączne obszary nie mające wspólnych wierszy ani kolumn.",
+        "correct": false
+      },
       {
         "text": "W dowolnym wielomianie szachowym dla szachownicy o wymiarze $n \\times n$ wszystkie współczynniki $r_k$ stojące przy $x^k$ dla $k > n$ przyjmują wartość zerową.",
         "correct": true
       },
       {
-        "text": "Współczynnik $r_0$ w wielomianie szachowym jest zawsze równy 0.",
-        "correct": false
-      },
-      {
-        "text": "Wielomian szachowy może mieć ujemne współczynniki.",
-        "correct": false
-      },
-      {
-        "text": "Wielomian szachowy zależy wyłącznie od wymiaru szachownicy.",
-        "correct": false
-      },
-      {
-        "text": "Dla każdej szachownicy wielomian szachowy ma ten sam stopień.",
+        "text": "Szachownicę $B$ można zdekomponować, poprzez wybór pewnego pola dopuszczalnego $s$, na dwie szachownice $B^1$ i $B^2$, takie że w $B^1$ niedostępny jest wiersz, a w $B^2$ niedostępna jest kolumna zawierająca pole $s$.",
         "correct": false
       }
     ],
@@ -2513,26 +2621,26 @@
   },
   {
     "id": 60,
-    "question": "Zaznacz wielomian szachowy dopełnienia szachownicy:",
+    "question": "Zaznacz funkcję tworzącą, która $\\textbf{może być}$ wielomianem szachowym $\\textbf{dopełnienia}$ podanej szachownicy $B$: <img src=\"img/zad_20_sterna_2019-2020.png\" height=\"100\" />",
     "options": [
+      {
+        "text": "$r_B(x) = 1 + 15x + 35x^2 + 50x^3 + 26x^4 + 4x^5$",
+        "correct": false
+      },
       {
         "text": "$r_B(x) = 1 + 10x + 35x^2 + 50x^3 + 26x^4 + 4x^5$",
         "correct": true
       },
       {
-        "text": "$r_B(x) = 10x + 35x^2 + 50x^3 + 26x^4 + 4x^5$",
+        "text": "$r_B(x) = 1 + 15x + 35x^2 + 50x^3 + 26x^4 + 4x^6$",
         "correct": false
       },
       {
-        "text": "$r_B(x) = 1 + 10x + 35x^2 + 50x^3 + 26x^4$",
+        "text": "$r_B(x) = 1 + 10x + 35x^2 + 50x^3 + 26x^4 + 4x^6$",
         "correct": false
       },
       {
-        "text": "$r_B(x) = 2 + 10x + 35x^2 + 50x^3 + 26x^4 + 4x^5$",
-        "correct": false
-      },
-      {
-        "text": "$r_B(x) = 1 + 11x + 35x^2 + 50x^3 + 26x^4 + 4x^5$",
+        "text": "$r_B(x) = 1 + 25x + 35x^2 + 50x^3 + 26x^4 + 4x^5$",
         "correct": false
       }
     ],
@@ -2540,26 +2648,26 @@
   },
   {
     "id": 61,
-    "question": "Wskaż wszystkie zdania prawdziwe dotyczące równoważności logicznej:",
+    "question": "Wskaż wszystkie zdania prawdziwe:",
     "options": [
       {
-        "text": "Zdania złożone $P$ i $Q$ są zdaniami logicznie równoważnymi, jeżeli mają takie same wartości logiczne dla wszystkich możliwych sposobów przypisania wartości logicznych ich zmiennym zdaniowym.",
+        "text": "Zdania złożone $P \\text{ i } Q$ są zdaniami logicznie równoważnymi, jeżeli $Q$ ma wartość logiczną prawdy zawsze wtedy, gdy $P$ ma wartość logiczną prawdy.",
+        "correct": false
+      },
+      {
+        "text": "Zdania złożone $P \\text{ i } Q$ są zdaniami logicznie równoważnymi, jeżeli $P$ ma wartość logiczną prawdy zawsze wtedy, gdy $Q$ ma wartość logiczną prawdy.",
+        "correct": false
+      },
+      {
+        "text": "Zdania złożone $P \\text{ i } Q$ są zdaniami logicznie równoważnymi, jeżeli mają takie same wartości logiczne dla wszystkich możliwych sposobów przypisania wartości logicznych ich zmiennym zdaniowym.",
         "correct": true
       },
       {
-        "text": "Zdania $P$ i $Q$ są równoważne, jeśli $P$ implikuje $Q$.",
+        "text": "Zdania złożone $P \\text{ i } Q$ są zdaniami logicznie równoważnymi, jeżeli $Q$ ma wartość logiczną fałszu zawsze wtedy, gdy zdanie $P$ ma wartość logiczną fałszu.",
         "correct": false
       },
       {
-        "text": "Równoważność logiczna zachodzi tylko dla zdań prostych.",
-        "correct": false
-      },
-      {
-        "text": "Dwa zdania są równoważne, jeśli mają tę samą liczbę zmiennych zdaniowych.",
-        "correct": false
-      },
-      {
-        "text": "Równoważność logiczna jest relacją asymetryczną.",
+        "text": "Zdania złożone $P \\text{ i } Q$ są zdaniami logicznie równoważnymi, jeżeli $P$ i $Q$ mają przeciwne wartości logiczne dla wszystkich możliwych sposobów przypisania wartości logicznych ich zmiennym zdaniowym.",
         "correct": false
       }
     ],
@@ -2567,27 +2675,27 @@
   },
   {
     "id": 62,
-    "question": "Wskaż wszystkie zdania prawdziwe dotyczące podstawiania:",
+    "question": "Wskaż wszystkie zdania prawdziwe:",
     "options": [
+      {
+        "text": "Jeżeli zdanie złożone $P$ zawiera zdanie $Q$, $R$ jest zdaniem takim, że $Q \\Rightarrow R$ i w $P$ zastąpimy dokładnie jedno wystąpienie $Q$ przez $R$, to otrzymamy zdanie złożone $P_1$ takie, że $P \\equiv P_1$.",
+        "correct": false
+      },
       {
         "text": "Jeżeli zdanie złożone $P$ jest tautologią i wszystkie wystąpienia pewnej zmiennej $p$ (zdania składowego) występującej w zdaniu $P$ zastąpimy zdaniem $R$, to otrzymane zdanie złożone $P_1$ będzie również tautologią.",
         "correct": true
       },
       {
+        "text": "Jeżeli zdanie złożone $P$ zawiera zdanie $Q$, $R$ jest zdaniem takim, że $Q \\Rightarrow R$ i w $P$ zastąpimy dokładnie jedno wystąpienie $Q$ przez $R$, to otrzymamy zdanie złożone $P_1$ takie, że $P \\equiv P_1$.",
+        "correct": false
+      },
+      {
+        "text": "Jeżeli zdanie złożone $P$ jest zdaniem sprzecznym i wszystkie wystąpienia pewnej zmiennej $p$ (zdania składowego) występującej w zdaniu $P$ zastąpimy zdaniem $R$, to otrzymane zdanie złożone $P_1$ będzie tautologią.",
+        "correct": false
+      },
+      {
         "text": "Jeżeli zdanie złożone $P$ zawiera zdanie $Q$, $R$ jest zdaniem takim, że $Q \\Leftrightarrow R$ i w $P$ zastąpimy jedno lub więcej wystąpień $Q$ przez $R$, to otrzymamy zdanie złożone $P_1$ takie, że $P \\equiv P_1$.",
         "correct": true
-      },
-      {
-        "text": "Podstawianie zmienia wartość logiczną każdego zdania.",
-        "correct": false
-      },
-      {
-        "text": "Podstawianie jest operacją nieodwracalną.",
-        "correct": false
-      },
-      {
-        "text": "Podstawianie można stosować tylko do zdań fałszywych.",
-        "correct": false
       }
     ],
     "multiple": true
@@ -2597,7 +2705,7 @@
     "question": "Wskaż definicję relacji równoważności:",
     "options": [
       {
-        "text": "Relację $\\rho \\subseteq X \\times X$, która jest relacją zwrotną i symetryczną, nazywamy relacją równoważności.",
+        "text": "Relację $\\rho \\subseteq X \\times X$, która jest relacją przeciwzwrotną, symetryczną i przechodnią, nazywamy relacją równoważności.",
         "correct": false
       },
       {
@@ -2605,15 +2713,15 @@
         "correct": true
       },
       {
-        "text": "Relację $\\rho \\subseteq X \\times X$, która jest relacją antysymetryczną i przechodnią, nazywamy relacją równoważności.",
+        "text": "Relację $\\rho \\subseteq X \\times X$, która jest relacją zwrotną, antysymetryczną i przechodnią, nazywamy relacją równoważności.",
         "correct": false
       },
       {
-        "text": "Relację $\\rho \\subseteq X \\times X$, która jest relacją symetryczną i przechodnią, nazywamy relacją równoważności.",
+        "text": "Relację $\\rho \\subseteq X \\times X$, która jest relacją przeciwzwrotną, antysymetryczną i przechodnią, nazywamy relacją równoważności.",
         "correct": false
       },
       {
-        "text": "Relację $\\rho \\subseteq X \\times X$, która jest relacją zwrotną i przechodnią, nazywamy relacją równoważności.",
+        "text": "Relację $\\rho \\subseteq X \\times X$, która jest spójną, symetryczną i przechodnią, nazywamy relacją równoważności.",
         "correct": false
       }
     ],
@@ -2624,23 +2732,23 @@
     "question": "Wskaż zdania będące definicjami izomorfizmu grafów:",
     "options": [
       {
-        "text": "Funkcja $f: V_1 \\to V_2$ jest izomorfizmem grafów, jeżeli $f$ jest funkcją wzajemnie jednoznaczną oraz dla każdej pary wierzchołków $x, y \\in V_1$, $\\{x,y\\} \\in E_1$ wtedy i tylko wtedy, gdy $\\{f(x), f(y)\\} \\in E_2$.",
+        "text": "Funkcja $f: V_1 \\rightarrow V_2$ jest izomorfizmem grafów, jeżeli $f$ jest funkcją wzajemnie jednoznaczną oraz dla każdej pary wierzchołków $x, y \\in V_1$, $\\{x, y\\} \\in E_2$ wtedy i tylko wtedy, gdy $\\{f(x), f(y)\\} \\in E_2$.",
+        "correct": false
+      },
+      {
+        "text": "Funkcja $f: V_1 \\rightarrow V_2$ jest izomorfizmem grafów, jeżeli $f$ jest funkcją wzajemnie jednoznaczną oraz dla każdej pary wierzchołków $x, y \\in V_1$, $\\{x, y\\} \\in E_1$ wtedy i tylko wtedy, gdy $\\{f(x), f(y)\\} \\in E_1$.",
+        "correct": false
+      },
+      {
+        "text": "Funkcja $f: V_1 \\rightarrow V_2$ jest izomorfizmem grafów, jeżeli $f$ jest funkcją wzajemnie jednoznaczną oraz dla każdej pary wierzchołków $x, y \\in V_1$, $\\{x, y\\} \\in E_1$ wtedy i tylko wtedy, gdy $\\{f(x), f(y)\\} \\in E_2$.",
         "correct": true
       },
       {
-        "text": "Izomorfizm grafów to dowolna funkcja między zbiorami wierzchołków.",
+        "text": "Funkcja $f: V_1 \\rightarrow V_2$ jest izomorfizmem grafów, jeżeli $f$ jest funkcją wzajemnie jednoznaczną oraz dla każdej pary wierzchołków $x, y \\in V_1$, $\\{x, y\\} \\in E_1$ wtedy i tylko wtedy, gdy $\\{f(x), f(y)\\} \\notin E_2$.",
         "correct": false
       },
       {
-        "text": "Dwa grafy są izomorficzne, jeśli mają tę samą liczbę wierzchołków.",
-        "correct": false
-      },
-      {
-        "text": "Izomorfizm grafów zachowuje tylko liczbę krawędzi.",
-        "correct": false
-      },
-      {
-        "text": "Izomorfizm grafów jest relacją antysymetryczną.",
+        "text": "Funkcja $f: V_1 \\rightarrow V_2$ jest izomorfizmem grafów, jeżeli $f$ jest funkcją wzajemnie jednoznaczną oraz dla każdej pary wierzchołków $x, y \\in V_1$, $\\{f(x), f(y)\\} \\in E_1$ wtedy i tylko wtedy, gdy $\\{f(x), f(y)\\} \\in E_2$.",
         "correct": false
       }
     ],
@@ -2648,26 +2756,26 @@
   },
   {
     "id": 65,
-    "question": "Niech $G=(V_1,V_2,E)$ będzie grafem dwudzielnym. Zaznacz definicję skojarzenia:",
+    "question": "Niech $G=(V_1, V_2, E)$ będzie grafem dwudzielnym. Wśród poniższych zdań wskaż wszystkie zdania prawdziwe.",
     "options": [
+      {
+        "text": "Skojarzeniem z $V_1$ do $V_2$ w $G$ jest zbiór złożony z $|V_2|$ krawędzi, które nie mają wspólnych wierzchołków końcowych.",
+        "correct": false
+      },
       {
         "text": "Skojarzeniem z $V_1$ do $V_2$ w $G$ jest zbiór złożony z $|V_1|$ krawędzi, które nie mają wspólnych wierzchołków końcowych.",
         "correct": true
       },
       {
-        "text": "Skojarzeniem jest dowolny podzbiór krawędzi grafu.",
+        "text": "Skojarzeniem z $V_1$ do $V_2$ w $G$ jest zbiór z tych krawędzi, które oba wierzchołki końcowe mają w zbiorze $V_1$.",
         "correct": false
       },
       {
-        "text": "Skojarzenie to zbiór wszystkich krawędzi grafu dwudzielnego.",
+        "text": "Skojarzeniem z $V_1$ do $V_2$ w $G$ jest zbiór z tych krawędzi, które oba wierzchołki końcowe mają w zbiorze $V_2$.",
         "correct": false
       },
       {
-        "text": "Skojarzenie musi zawierać wszystkie wierzchołki grafu.",
-        "correct": false
-      },
-      {
-        "text": "Skojarzenie to ścieżka w grafie dwudzielnym.",
+        "text": "Skojarzeniem z $V_1$ do $V_2$ w $G$ jest podzbiór zbioru $V_1$ zawierający wszystkie wierzchołki o stopniu parzystym.",
         "correct": false
       }
     ],
@@ -2675,26 +2783,26 @@
   },
   {
     "id": 66,
-    "question": "Wskaż wszystkie zdania prawdziwe dotyczące równania diofantycznego:",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe:",
     "options": [
       {
-        "text": "Jeżeli $a,b,c \\in P$, to równanie diofantyczne $ax + by = c$ ma rozwiązania całkowite $x=x_0, y=y_0$ wtedy i tylko wtedy, gdy $\\gcd(a,b)$ dzieli $c$.",
+        "text": "Jeżeli $a,b,c \\in \\mathbb{P}$, to równanie diofantyczne $ax+by=c$ ma rozwiązania całkowite $x=x_0, y=y_0$ wtedy i tylko wtedy, gdy $\\gcd(a,b)$ dzieli $c$.",
         "correct": true
       },
       {
-        "text": "Równanie diofantyczne zawsze ma rozwiązanie w liczbach całkowitych.",
+        "text": "Jeżeli $a,b,c \\in \\mathbb{P}$, to równanie diofantyczne $ax+by=c$ ma rozwiązania całkowite $x=x_0, y=y_0$ wtedy i tylko wtedy, gdy $c$ dzieli $\\gcd(a,b)$.",
         "correct": false
       },
       {
-        "text": "Równanie diofantyczne ma co najwyżej jedno rozwiązanie.",
+        "text": "Jeżeli $a,b,c \\in \\mathbb{P}$, to równanie diofantyczne $ax+by=c$ ma rozwiązania całkowite $x=x_0, y=y_0$ wtedy i tylko wtedy, gdy $a$ i $b$ są liczbami pierwszymi.",
         "correct": false
       },
       {
-        "text": "Rozwiązania równania diofantycznego są zawsze liczbami dodatnimi.",
+        "text": "Jeżeli $a,b,c \\in \\mathbb{P}$, to równanie diofantyczne $ax+by=c$ ma rozwiązania całkowite $x=x_0, y=y_0$ wtedy i tylko wtedy, gdy $c$ dzieli $\\operatorname{lcm}(a,b)$.",
         "correct": false
       },
       {
-        "text": "Równanie diofantyczne to równanie z jedną niewiadomą.",
+        "text": "Jeżeli $a,b,c \\in \\mathbb{P}$, to równanie diofantyczne $ax+by=c$ ma rozwiązania całkowite $x=x_0, y=y_0$ wtedy i tylko wtedy, gdy $\\operatorname{lcm}(a,b)$ dzieli $c$.",
         "correct": false
       }
     ],
@@ -2702,10 +2810,10 @@
   },
   {
     "id": 67,
-    "question": "Graf $H$ sprzężony grafu $G$ (droga Eulera):",
+    "question": "Niech $H$ będzie grafem sprzężonym pewnego grafu $G$. Wśród poniższych zdań wskaż wszystkie zdania prawdziwe:",
     "options": [
       {
-        "text": "W grafie $G$ istnieje droga Eulera wtedy i tylko wtedy, gdy w grafie $H$ istnieje cykl Hamiltona.",
+        "text": "W grafie $G$ istnieje ścieżka Hamiltona wtedy i tylko wtedy, gdy w grafie $H$ istnieje droga Eulera.",
         "correct": false
       },
       {
@@ -2713,15 +2821,15 @@
         "correct": true
       },
       {
-        "text": "W grafie $G$ istnieje cykl Eulera wtedy i tylko wtedy, gdy w grafie $H$ istnieje ścieżka Hamiltona.",
+        "text": "W grafie $G$ istnieje droga Eulera wtedy i tylko wtedy, gdy w grafie $H$ istnieje obwód Eulera.",
         "correct": false
       },
       {
-        "text": "Droga Eulera w grafie $G$ nie ma związku ze ścieżką Hamiltona w grafie $H$.",
+        "text": "W grafie $G$ istnieje ścieżka Hamiltona wtedy i tylko wtedy, gdy w grafie $H$ istnieje cykl Hamiltona.",
         "correct": false
       },
       {
-        "text": "Graf sprzężony jest zawsze grafem pustym.",
+        "text": "W grafie $G$ istnieje cykl Hamiltona wtedy i tylko wtedy, gdy w grafie $H$ istnieje ścieżka Hamiltona.",
         "correct": false
       }
     ],
@@ -2729,26 +2837,26 @@
   },
   {
     "id": 68,
-    "question": "Minimalna liczba wierzchołków grafu $G$, wśród których jest co najmniej jeden koniec każdej krawędzi:",
+    "question": "Niech $G=(V_1,V_2,E)$ będzie grafem dwudzielnym. Wśród poniższych zdań wskaż wszystkie zdania prawdziwe:",
     "options": [
       {
-        "text": "równa jest minimalnej liczbie krawędzi w skojarzeniu.",
-        "correct": false
-      },
-      {
-        "text": "równa jest maksymalnej liczbie krawędzi w skojarzeniu.",
+        "text": "Minimalna liczba wierzchołków grafu $G$, wśród których jest co najmniej jeden koniec każdej jego krawędzi równa jest maksymalnej liczbie krawędzi w skojarzeniu.",
         "correct": true
       },
       {
-        "text": "jest zawsze równa liczbie wierzchołków grafu.",
+        "text": "Minimalna liczba wierzchołków grafu $G$, wśród których jest co najmniej jeden koniec każdej jego krawędzi równa jest minimalnej liczbie krawędzi w skojarzeniu.",
         "correct": false
       },
       {
-        "text": "jest zawsze równa liczbie krawędzi grafu.",
+        "text": "Minimalna liczba wierzchołków grafu $G$, wśród których jest co najmniej jeden koniec każdej jego krawędzi równa jest liczbie krawędzi grafu $G$.",
         "correct": false
       },
       {
-        "text": "nie ma związku z liczbą krawędzi w skojarzeniu.",
+        "text": "Maksymalna liczba wierzchołków grafu $G$, wśród których jest co najmniej jeden koniec każdej jego krawędzi równa jest minimalnej liczbie wierzchołków w skojarzeniu.",
+        "correct": false
+      },
+      {
+        "text": "Maksymalna liczba wierzchołków grafu $G$, wśród których jest co najmniej jeden koniec każdej jego krawędzi równa jest maksymalnej liczbie wierzchołków w skojarzeniu.",
         "correct": false
       }
     ],
@@ -2756,26 +2864,26 @@
   },
   {
     "id": 69,
-    "question": "Wśród poniższych zdań wskaż prawdziwe dotyczące funkcji tworzących:",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe:",
     "options": [
       {
-        "text": "$1 + 2^2x + 3^2x^2 + 4^2x^3 + ...$ jest funkcją tworzącą sekwencji liczb $1^2, 2^2, 3^2, 4^2, ...$",
-        "correct": true
-      },
-      {
-        "text": "$x + 2^2x^2 + 3^2x^3 + 4^2x^4 + ...$ jest funkcją tworzącą sekwencji liczb $0^2, 1^2, 2^2, 3^2, 4^2, ...$",
-        "correct": true
-      },
-      {
-        "text": "Funkcja tworząca musi mieć skończoną liczbę składników.",
+        "text": "$1+2^2x+3^2x^2+4^2x^3+...$ jest wykładniczą funkcją tworzącą sekwencji liczb $1^2, 2^2, 3^2, 4^2, ...$",
         "correct": false
       },
       {
-        "text": "Współczynniki funkcji tworzącej są zawsze dodatnie.",
+        "text": "$1+2^2x+3^2x^2+4^2x^3+...$jest funkcją tworzącą sekwencji liczb $1^2, 2^2, 3^2, 4^2, ...$",
+        "correct": true
+      },
+      {
+        "text": "$x+2^2x^2+3^2x^2+4^2x^4+...$ jest funkcją tworzącą sekwencji liczb $0^2, 1^2, 2^2, 3^2, 4^2, ...$",
+        "correct": true
+      },
+      {
+        "text": "$x+2^2x^2+3^2x^2+4^2x^4+...$ jest wykładniczą funkcją tworzącą sekwencji liczb $0^2, 1^2, 2^2, 3^2, 4^2, ...$",
         "correct": false
       },
       {
-        "text": "Funkcja tworząca sekwencji jest jednoznacznie określona.",
+        "text": "$x+2^2x^2+3^2x^2+4^2x^4+...$ jest funkcją tworzącą sekwencji liczb $1^2, 2^2, 3^2, 4^2, ...$",
         "correct": false
       }
     ],
@@ -2783,130 +2891,242 @@
   },
   {
     "id": 70,
-    "question": "Funkcja $e^x$ może być przedstawiona... Wskaż prawdziwe zdania:",
+    "question": "Funkcję $e^x$ można przedstawić w postaci: $e^x = 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!} + \\frac{x^4}{4!} + \\dots = \\sum_{i=0}^{\\infty} \\frac{x^i}{i!}$. Wśród poniższych zdań wskaż wszystkie zdania prawdziwe:",
     "options": [
       {
-        "text": "$e^x$ jest funkcją tworzącą sekwencji liczb $1, 1, \\frac{1}{2!}, \\frac{1}{3!}, \\frac{1}{4!}, ...$",
+        "text": "$e^x$ jest wykładniczą funkcją tworzącą sekwencji liczb $1, 1, \\frac{1}{2!}, \\frac{1}{3!}, \\frac{1}{4!}, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "$e^x$ jest funkcją tworzącą sekwencji liczb $1, 1, 1, 1, 1, 1, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "$e^x$ jest funkcją tworzącą sekwencji liczb $1, 1, \\frac{1}{2!}, \\frac{1}{3!}, \\frac{1}{4!}, \\dots$.",
         "correct": true
       },
       {
-        "text": "$e^x$ jest wykładniczą funkcją tworzącą sekwencji liczb $1, 1, 1, 1, 1, 1, ...$",
+        "text": "$e^x$ jest funkcją tworzącą sekwencji liczb $1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "$e^x$ jest wykładniczą funkcją tworzącą sekwencji liczb $1, 1, 1, 1, 1, 1, \\dots$.",
         "correct": true
-      },
-      {
-        "text": "$e^x$ nie może być funkcją tworzącą żadnej sekwencji.",
-        "correct": false
-      },
-      {
-        "text": "$e^x$ jest funkcją tworzącą sekwencji liczb $1, 2, 3, 4, 5, ...$",
-        "correct": false
-      },
-      {
-        "text": "$e^x$ jest wielomianem.",
-        "correct": false
       }
     ],
     "multiple": true
   },
   {
     "id": 71,
-    "question": "Funkcję tworzącą dla permutacji z klas elementów $\\{1,1,1,2,2,...\\}$:",
+    "question": "Zaznacz wszystkie zdania prawdziwe:",
     "options": [
       {
-        "text": "$(1+x+\\frac{x^2}{2!}+\\frac{x^3}{3!})(1+x+\\frac{x^2}{2!})...$",
+        "text": "Zdaniem odwrotnym do zdania $p \\rightarrow q$ jest zdanie $p \\rightarrow \\neg q$.",
+        "correct": false
+      },
+      {
+        "text": "Zdaniem przeciwstawnym do zdania $p \\rightarrow q$ jest zdanie $\\neg q \\rightarrow \\neg p$.",
         "correct": true
+      },
+      {
+        "text": "Zdanie złożone jest tautologią, jeżeli jest ono fałszywe niezależnie od wartości logicznych jego zdań składowych.",
+        "correct": false
+      },
+      {
+        "text": "Zdaniem odwrotnym do zdania $p \\rightarrow q$ jest zdanie $\\neg p \\rightarrow \\neg q$.",
+        "correct": false
+      },
+      {
+        "text": "Zdaniem przeciwstawnym do zdania $p \\rightarrow q$ jest zdanie $\\neg q \\rightarrow p$.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 72,
-    "question": "Wśród poniższych zdań wskaż prawdziwe (wyrażenie regularne):",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe:",
     "options": [
       {
-        "text": "$(0+1)^*$ jest wyraz. regularnym nadzbioru $\\{0,00,11,001,000,...\\}$",
-        "correct": true
-      },
-      {
-        "text": "$(0+1)^*$ jest wyraz. regularnym nadzbioru $\\{1,2,3,11,12,13,...\\}$",
+        "text": "$5$ i $10$ są liczbami względnie pierwszymi.",
         "correct": false
       },
       {
-        "text": "$(0+1)^*11$ jest wyraz. regularnym podzbioru $\\{11,011,111,0011,...\\}$",
+        "text": "$2$ i $3$ są liczbami względnie pierwszymi.",
         "correct": true
+      },
+      {
+        "text": "$1$ jest najmniejszą liczbą pierwszą.",
+        "correct": false
+      },
+      {
+        "text": "$2$ jest najmniejszą liczbą pierwszą.",
+        "correct": true
+      },
+      {
+        "text": "$0$ jest najmniejszą liczbą pierwszą.",
+        "correct": false
       }
     ],
     "multiple": true
   },
   {
     "id": 73,
-    "question": "Zaznacz zdania prawdziwe (suma i iloczyn Cauchy'ego):",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe:",
     "options": [
       {
-        "text": "$(1+x+x^2+...)(1-x+x^2-x^3+...) = 1 + x^2 + x^4 + ...$",
-        "correct": true
-      }
-    ],
-    "multiple": false
-  },
-  {
-    "id": 74,
-    "question": "Zaznacz zdania prawdziwe (rachunek zdań):",
-    "options": [
-      {
-        "text": "$[(p \\Rightarrow q) \\land (q \\Rightarrow r)] \\Rightarrow (p \\Rightarrow r)$ jest prawem przechodniości implikacji.",
-        "correct": true
-      }
-    ],
-    "multiple": false
-  },
-  {
-    "id": 75,
-    "question": "Wskaż poprawne zdanie (podzielność):",
-    "options": [
-      {
-        "text": "Zapis $a|b$ oznacza, że $a$ dzieli $b$ bez reszty czytamy: $a$ dzieli $b$, $a$ jest dzielnikiem $b$, $b$ jest wielokrotnością $a$, $b$ jest podzielne przez $a$.",
-        "correct": true
-      }
-    ],
-    "multiple": false
-  },
-  {
-    "id": 76,
-    "question": "Wskaż zdania zawierające poprawne definicje (teoria liczb):",
-    "options": [
-      {
-        "text": "$a \\equiv b \\mod n$ jeżeli liczby $a$ i $b$ przy dzieleniu przez $n$ dają taką samą resztę.",
-        "correct": true
-      }
-    ],
-    "multiple": false
-  },
-  {
-    "id": 77,
-    "question": "Droga Eulera i ścieżka Hamiltona:",
-    "options": [
-      {
-        "text": "Każdy graf który ma drogę/cykl Eulera ma też ścieżkę/cykl Hamiltona.",
+        "text": "Rodzina zbiorów $\\mathcal{A} = (A_1, A_2, \\dots, A_n)$ ma transwersalę wtedy i tylko wtedy, gdy $|\\bigcup_{i \\in I} A_i| \\geq |I|$ dla wszystkich $I \\subseteq \\{A_1, A_2, \\dots, A_n\\}$.",
         "correct": false
       },
       {
-        "text": "Graf de Bruijna ma cykl Eulera.",
+        "text": "Jeżeli $\\mathcal{A} = (A_1, A_2, \\dots, A_n)$ jest rodziną zbiorów, a $P \\subseteq A_1 \\cup A_2 \\cup \\dots \\cup A_n$, to $\\mathcal{A}$ ma transwersalę, która zawiera zbiór $P$ wtedy i tylko wtedy, gdy $\\mathcal{A}$ ma transwersalę oraz $|P \\setminus (\\bigcup_{i \\in I} A_i)| \\geq n - |I|$ dla każdego $I \\subseteq \\{1, 2, \\dots, n\\}$.",
+        "correct": false
+      },
+      {
+        "text": "Rodzina zbiorów $\\mathcal{A} = (A_1, A_2, \\dots, A_n)$ ma transwersalę wtedy i tylko wtedy, gdy $|\\bigcup_{i \\in I} A_i| \\geq |I|$ dla wszystkich $I \\subseteq \\{1, 2, \\dots, n\\}$.",
+        "correct": true
+      },
+      {
+        "text": "Jeżeli $\\mathcal{A} = (A_1, A_2, \\dots, A_n)$ jest rodziną zbiorów, a $P \\subseteq A_1 \\cup A_2 \\cup \\dots \\cup A_n$, to $\\mathcal{A}$ ma transwersalę, która zawiera zbiór $P$ wtedy i tylko wtedy, gdy $\\mathcal{A}$ ma transwersalę oraz $|P \\setminus (\\bigcup_{i \\in I} A_i)| \\leq n - |I|$ dla każdego $I \\subseteq \\{1, 2, \\dots, n\\}$.",
+        "correct": true
+      },
+      {
+        "text": "Transwersalą rodziny zbiorów $\\mathcal{A} = (A_1, A_2, \\dots, A_n)$ jest zbiór $Y = (A_1 \\cup A_2 \\cup \\dots \\cup A_n) \\setminus (A_1 \\cap A_2 \\cap \\dots \\cap A_n)$, którego elementy mogą zostać zapisane w pewnym porządku.",
+        "correct": false
+      }
+    ],
+    "multiple": true
+  },
+  {
+    "id": 74,
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe:",
+    "options": [
+      {
+        "text": "Każdy graf $(\\infty, k)$-etykietowalny jest również $(n-k,k)$-etykietowalny, gdzie $n$ jest liczbą wierzchołków w grafie.",
+        "correct": false
+      },
+      {
+        "text": "Jeżeli graf $G$ jest etykietowalny za pomocą etykiet o długości $k>2$ zbudowanych nad alfabetem o dowolnej liczności, to jest on również etykietowalny za pomocą etykiet o długości $l=2, \\dots, k-1$ zbudowanych nad alfabetem o dowolnej liczności.",
+        "correct": true
+      },
+      {
+        "text": "Każdy graf $(\\infty, k)$-etykietowalny jest również $(nk,k)$-etykietowalny, gdzie $n$ jest liczbą wierzchołków w grafie.",
+        "correct": true
+      },
+      {
+        "text": "Grafu niespójnego nie można zaetykietować.",
+        "correct": false
+      },
+      {
+        "text": "Każdy graf $(\\infty, k)$-etykietowalny jest również $(k,nk)$-etykietowalny, gdzie $n$ jest liczbą wierzchołków w grafie.",
+        "correct": false
+      }
+    ],
+    "multiple": true
+  },
+  {
+    "id": 75,
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe:",
+    "options": [
+      {
+        "text": "Liczby całkowite $a$ i $b$ są względnie pierwsze, jeżeli istnieją liczby całkowite $x$ i $y$, takie że $ax + by = 2$.",
+        "correct": false
+      },
+      {
+        "text": "Liczby całkowite $a$ i $b$ są względnie pierwsze, jeżeli $\\gcd(a, b) = 1$.",
+        "correct": true
+      },
+      {
+        "text": "Liczby całkowite $a$ i $b$ są względnie pierwsze, jeżeli $\\gcd(a, b) = 0$.",
+        "correct": false
+      },
+      {
+        "text": "Liczby całkowite $a$ i $b$ są względnie pierwsze, jeżeli istnieją liczby całkowite $x$ i $y$, takie że $ax + by = 1$.",
+        "correct": true
+      },
+      {
+        "text": "Liczby całkowite $a$ i $b$ są względnie pierwsze, jeżeli istnieją liczby całkowite $x$ i $y$, takie że $ax + by = \\sqrt{2}$.d",
+        "correct": false
+      }
+    ],
+    "multiple": true
+  },
+  {
+    "id": 76,
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe:",
+    "options": [
+      {
+        "text": "Funkcja $f(x) = a_0 x_0 + a_1 x_1 + a_2 x_2^2 + a_3 x_3^3 + \\dots = \\sum_{i=0}^{\\infty} a_i x_i^i$ jest wykładniczą funkcją tworzącą sekwencji liczb rzeczywistych $a_0, a_1 x_1, a_2 x_2, a_3 x_3, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "Funkcja $f(x) = a_0 + a_1 x + a_2 x^2 + a_3 x^3 + \\dots = \\sum_{i=0}^{\\infty} a_i x^i$ jest funkcją tworzącą sekwencji liczb rzeczywistych $a_0, a_1, a_2, a_3, \\dots$.",
+        "correct": true
+      },
+      {
+        "text": "Funkcja $f(x) = \\frac{1}{a_0} + \\frac{x}{a_1} + \\frac{2! x^2}{a_2} + \\frac{3! x^3}{a_3} + \\dots = \\sum_{i=0}^{\\infty} \\frac{i! x^i}{a_i}$ jest wykładniczą funkcją tworzącą sekwencji liczb rzeczywistych $a_0, a_1, a_2, a_3, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "Funkcja $f(x) = a_0 + a_1 x + a_2 x^2 + a_3 x^3 + \\dots = \\sum_{i=0}^{\\infty} a_i x^i$ jest wykładniczą funkcją tworzącą sekwencji liczb rzeczywistych $a_0, a_1, a_2, a_3, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "Funkcja $f(x) = a_0 + a_1 x + \\frac{a_2 x^2}{2!} + \\frac{a_3 x^3}{3!} + \\dots = \\sum_{i=0}^{\\infty} \\frac{a_i x^i}{i!}$ jest wykładniczą funkcją tworzącą sekwencji liczb rzeczywistych $a_0, a_1, a_2, a_3, \\dots$.",
         "correct": true
       }
     ],
     "multiple": true
   },
   {
-    "id": 78,
-    "question": "Grafy de Bruijna wskaż prawdziwe:",
+    "id": 77,
+    "question": "Wybierz wszystkie poprawne:",
     "options": [
       {
-        "text": "W grafie de Bruijna $B(2,5)$ z każdego wierzchołka wychodzą 2 krawędzie.",
+        "text": "Relację, która jest jednocześnie relacją przechodnią, symetryczną i spójną w zbiorze $X$ nazywamy relacją liniowo porządkującą zbiór $X$.",
+        "correct": false
+      },
+      {
+        "text": "Relację, która jest jednocześnie relacją przechodnią, symetryczną i przeciwzwrotną w zbiorze $X$ nazywamy relacją liniowo porządkującą zbiór $X$.",
+        "correct": false
+      },
+      {
+        "text": "Relację, która jest jednocześnie relacją zwrotną, antysymetryczną i spójną w zbiorze $X$ nazywamy relacją liniowo porządkującą zbiór $X$.",
+        "correct": false
+      },
+      {
+        "text": "Relację, która jest jednocześnie relacją przechodnią, antysymetryczną, zwrotną i spójną w zbiorze $X$ nazywamy relacją liniowo porządkującą zbiór $X$.",
         "correct": true
       },
       {
-        "text": "Graf de Bruijna $B(2,4)$ ma 16 wierzchołków.",
+        "text": "Relację, która jest jednocześnie relacją zwrotną, przechodnią i antysymetryczną w zbiorze $X$ nazywamy relacją liniowo porządkującą zbiór $X$.",
+        "correct": false
+      }
+    ],
+    "multiple": false
+  },
+  {
+    "id": 78,
+    "question": "Wybierz wszystkie poprawne:",
+    "options": [
+      {
+        "text": "Graf $G=(V,E)$ jest grafem dwudzielnym, jeżeli występuje w nim parzysta liczba rozłącznych ścieżek Hamiltona.",
+        "correct": false
+      },
+      {
+        "text": "Graf $G=(V,E)$ jest grafem dwudzielnym, jeżeli $V=V_1 \\cup V_2$, $V_1 \\subseteq V_2$ oraz dla każdej krawędzi $\\{x,y\\} \\in E$ zachodzi $x \\in V_1 \\land y \\in V_2$.",
+        "correct": false
+      },
+      {
+        "text": "Graf $G=(V,E)$ jest grafem dwudzielnym, jeżeli jego zbiór wierzchołków można podzielić na dwa rozłączne podzbiory w taki sposób, że żadna krawędź występująca w tym grafie nie jest incydentna z dwoma wierzchołkami należącymi do tego samego podzbioru.",
+        "correct": true
+      },
+      {
+        "text": "Graf $G=(V,E)$ jest grafem dwudzielnym, jeżeli występuje w nim parzysta liczba rozłącznych cykli.",
+        "correct": false
+      },
+      {
+        "text": "Graf $G=(V,E)$ jest grafem dwudzielnym, jeżeli $V=V_1 \\cup V_2$, $V_1 \\cap V_2 = \\emptyset$ oraz dla każdej krawędzi $\\{x,y\\} \\in E$ zachodzi $x \\in V_1 \\land y \\in V_2$.",
         "correct": true
       }
     ],
@@ -2914,10 +3134,26 @@
   },
   {
     "id": 79,
-    "question": "Wskaż zdania prawdziwe (wielomian szachowy - dopełnienie):",
+    "question": "Wybierz wszystkie poprawne:",
     "options": [
       {
-        "text": "Wielomian szachowy dla dopełnienia szachownicy $B$ może być wyznaczony na podstawie wielomianu szachowego szachownicy $B$.",
+        "text": "Skojarzenie w grafie $G=(V,E)$ jest to największy podgraf pełny tego grafu.",
+        "correct": false
+      },
+      {
+        "text": "Skojarzenie w grafie $G=(V,E)$ jest to jego drzewo rozpinające.",
+        "correct": false
+      },
+      {
+        "text": "Skojarzenie w grafie $G=(V,E)$ jest to ścieżka przechodząca przez wszystkie jego wierzchołki.",
+        "correct": false
+      },
+      {
+        "text": "Skojarzenie w grafie $G=(V,E)$ jest to droga przechodząca przez wszystkie jego krawędzie.",
+        "correct": false
+      },
+      {
+        "text": "Skojarzenie w grafie $G=(V,E)$ jest to zbiór krawędzi, z których żadne dwie nie mają wspólnego wierzchołka końcowego.",
         "correct": true
       }
     ],
@@ -2925,76 +3161,188 @@
   },
   {
     "id": 80,
-    "question": "Wskaż wszystkie zdania prawdziwe (grafy dwudzielne):",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania będące definicjami drzewa.",
     "options": [
       {
-        "text": "Graf dwudzielny to pozbawiony pętli graf prosty, w którym można wyróżnić dwa rozłączne zbiory wierzchołków $V_1$ i $V_2$ w taki sposób, że każda krawędź łączy wierzchołek ze zbioru $V_1$ z wierzchołkiem ze zbioru $V_2$.",
+        "text": "Graf $G=(V,E)$ jest drzewem, jeżeli posiada korzeń.",
+        "correct": false
+      },
+      {
+        "text": "Graf $G=(V,E)$ jest drzewem, jeżeli nie zawiera cykli i $|V|=|E|-1$.",
+        "correct": false
+      },
+      {
+        "text": "Graf $G=(V,E)$ jest drzewem, jeżeli nie zawiera cykli i jeżeli $x,y \\in V$ oraz $\\{x,y\\} \\notin E$, to dodanie do $G$ krawędzi $\\{x,y\\}$ spowoduje powstanie grafu $G'$ zawierającego dokładnie jeden cykl.",
         "correct": true
+      },
+      {
+        "text": "Graf $G=(V,E)$ jest drzewem, jeżeli nie zawiera cykli i $|V|=|E|+1$.",
+        "correct": true
+      },
+      {
+        "text": "Graf $G=(V,E)$ jest drzewem, jeżeli jest spójny i $|V|=|E|-1$.",
+        "correct": false
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 81,
-    "question": "Zaznacz zdania prawdziwe (liczby Stirlinga II rodzaju):",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe.",
     "options": [
       {
-        "text": "Liczby Stirlinga II rodzaju $S(n,k)$ opisują liczbę sposobów podziału zbioru $n$-elementowego na $k$ niepustych podzbiorów.",
+        "text": "1-graf $H=(A,U)$ jest grafem sprzężonym wtedy i tylko wtedy, gdy dla każdej pary wierzchołków $x,y \\in A$ spełniony jest następujący warunek: $N^+(x) \\cap N^+(y) \\neq \\emptyset \\Rightarrow N^-(x) \\cap N^-(y) \\neq \\emptyset$.",
+        "correct": false
+      },
+      {
+        "text": "1-graf $H=(A,U)$ jest grafem sprzężonym wtedy i tylko wtedy, gdy dla każdej pary wierzchołków $x,y \\in A$ spełniony jest następujący warunek: $N^+(x) \\cap N^+(y) \\neq \\emptyset \\Rightarrow N^+(x) = N^+(y)$.",
         "correct": true
+      },
+      {
+        "text": "1-graf $H=(A,U)$ jest grafem sprzężonym wtedy i tylko wtedy, gdy dla każdej pary wierzchołków $x,y \\in A$ spełniony jest następujący warunek: $N^+(x) \\cap N^+(y) \\neq \\emptyset \\Rightarrow (N^+(x) = N^+(y) \\land N^-(x) \\cap N^-(y) = \\emptyset)$.",
+        "correct": false
+      },
+      {
+        "text": "1-graf $H=(A,U)$ jest grafem sprzężonym wtedy i tylko wtedy, gdy dla każdej pary wierzchołków $x,y \\in A$ spełniony jest następujący warunek: $N^-(x) \\cap N^-(y) \\neq \\emptyset \\Rightarrow N^+(x) \\cap N^+(y) \\neq \\emptyset$.",
+        "correct": false
+      },
+      {
+        "text": "1-graf $H=(A,U)$ jest grafem sprzężonym wtedy i tylko wtedy, gdy dla każdej pary wierzchołków $x,y \\in A$ spełniony jest następujący warunek: $N^+(x) \\cap N^+(y) \\neq \\emptyset \\Rightarrow N^-(x) \\cap N^-(y) = \\emptyset$.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 82,
-    "question": "Wskaż definicję liczby podziałów:",
+    "question": "Niech $G=(V,E)$ będzie grafem nieskierowanym bez wierzchołków izolowanych. Wśród poniższych zdań wskaż zdania prawdziwe.",
     "options": [
       {
-        "text": "$p_k(n)$ jest liczbą podziałów $n$ na dokładnie $k$ składników.",
+        "text": "$G$ zawiera cykl Hamiltona wtedy i tylko wtedy, gdy $G$ jest spójny i każdy wierzchołek $G$ ma nieparzysty stopień.",
+        "correct": false
+      },
+      {
+        "text": "$G$ zawiera drogę Eulera wtedy i tylko wtedy, gdy $G$ jest spójny i zawiera dokładnie dwa wierzchołki o stopniu nieparzystym.",
+        "correct": false
+      },
+      {
+        "text": "$G$ zawiera obwód Eulera wtedy i tylko wtedy, gdy $G$ jest spójny i każdy wierzchołek $G$ ma parzysty stopień.",
         "correct": true
+      },
+      {
+        "text": "$G$ zawiera drogę Eulera wtedy i tylko wtedy, gdy $G$ jest spójny i zawiera dokładnie dwa wierzchołki o stopniu parzystym.",
+        "correct": false
+      },
+      {
+        "text": "$G$ zawiera cykl Hamiltona wtedy i tylko wtedy, gdy $G$ jest spójny i każdy wierzchołek $G$ ma parzysty stopień.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 83,
-    "question": "Formuła Cayley'a:",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe.",
     "options": [
       {
-        "text": "Liczba różnych drzew rozpinających dla grafu pełnego $K_n$ wynosi $n^{n-2}$.",
+        "text": "$1 + 2x + 3x^2 + 4x^3 + 5x^4 + \\dots$ jest funkcją tworzącą sekwencji liczb $1, 2, 3, 4, 5, \\dots$.",
         "correct": true
+      },
+      {
+        "text": "$x + x^2 + x^3 + x^4 + x^5 + \\dots$ jest funkcją tworzącą sekwencji liczb $0, 1, 2, 3, 4, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "$1 + 2x + 3x^2 + 4x^3 + 5x^4 + \\dots$ jest funkcją tworzącą sekwencji liczb $0, 1, 2, 3, 4, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "$1 + 2x + 3x^2 + 4x^3 + 5x^4 + \\dots$ jest wykładniczą funkcją tworzącą sekwencji liczb $1, 2, 3, 4, 5, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "$x + x^2 + x^3 + x^4 + x^5 + \\dots$ jest funkcją tworzącą sekwencji liczb $1, 2, 3, 4, 5, \\dots$.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 84,
-    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe (inwersje):",
+    "question": "Wybierz wszystkie poprawne:",
     "options": [
       {
-        "text": "Inwersję w permutacji $(a_1, a_2, ..., a_n)$ tworzy para elementów $(a_i, a_j)$ taka, że $i < j$ i $a_i > a_j$.",
+        "text": "Między dwoma dowolnymi wierzchołkami $x$ i $y$ należącymi do sieci minimalna przepustowość przekroju, który rozdziela $x$ od $y$, równa jest maksymalnej wartości przepływu z $x$ do $y$.",
         "correct": true
+      },
+      {
+        "text": "Między dwoma dowolnymi wierzchołkami $x$ i $y$ należącymi do sieci maksymalna przepustowość przekroju, który rozdziela $x$ od $y$, równa jest minimalnej wartości przepływu z $x$ do $y$.",
+        "correct": false
+      },
+      {
+        "text": "Między dwoma dowolnymi wierzchołkami $x$ i $y$ należącymi do sieci minimalna przepustowość przekroju, który rozdziela $x$ od $y$, równa jest minimalnej wartości przepływu z $x$ do $y$.",
+        "correct": false
+      },
+      {
+        "text": "Między dwoma dowolnymi wierzchołkami $x$ i $y$ należącymi do sieci maksymalna przepustowość przekroju, który rozdziela $x$ od $y$, równa jest maksymalnej wartości przepływu z $x$ do $y$.",
+        "correct": false
+      },
+      {
+        "text": "Między dwoma dowolnymi wierzchołkami $x$ i $y$ należącymi do sieci minimalna przepustowość przekroju, który rozdziela $x$ od $y$, równa jest $out(x)$.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 85,
-    "question": "Przestawienia w permutacji:",
+    "question": "Wybierz wszystkie poprawne:",
     "options": [
       {
-        "text": "Permutacja parzysta to permutacja z parzystą liczbą inwersji.",
+        "text": "Jeżeli liczby $b_1, b_2, \\dots, b_n$ są wynikiem pewnego turnieju, to ich suma może być większa niż $\\binom{n}{2}$.",
+        "correct": false
+      },
+      {
+        "text": "Jeżeli liczby $b_1, b_2, \\dots, b_n$ są wynikiem pewnego turnieju, to ich suma może być mniejsza niż $\\binom{n}{2}$.",
+        "correct": false
+      },
+      {
+        "text": "Jeżeli liczby $b_1, b_2, \\dots, b_n$ są wynikiem pewnego turnieju, to dla pewnego $r$, takiego że $2 \\leq r \\leq n$, można wybrać $r$ spośród tych liczb w taki sposób, że suma wybranych liczb jest mniejsza niż $\\binom{n}{2}$.",
+        "correct": false
+      },
+      {
+        "text": "Jeżeli liczby $b_1, b_2, \\dots, b_n$ są wynikiem pewnego turnieju, to dla żadnego $r$, takiego że $2 \\leq r \\leq n$, nie można wybrać $r$ spośród tych liczb w taki sposób, że suma wybranych liczb jest mniejsza niż $\\binom{r}{2}$.",
+        "correct": true
+      },
+      {
+        "text": "Jeżeli liczby $b_1, b_2, \\dots, b_n$ są wynikiem pewnego turnieju, to ich suma nie może być ani mniejsza, ani większa niż $\\binom{n}{2}$.",
         "correct": true
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 86,
-    "question": "Zaznacz zdania prawdziwe (NWD):",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe.",
     "options": [
       {
-        "text": "Dla dowolnych liczb $a,b \\in \\mathbb{Z}$ istnieją takie liczby $x,y \\in \\mathbb{Z}$, że $\\gcd(a,b) = ax + by$.",
+        "text": "W grafie de Bruijna $B(d,k)$ może wystąpić co najwyżej $k$ etykiet o długości $d$.",
+        "correct": false
+      },
+      {
+        "text": "W grafie de Bruijna $B(d,k)$ może wystąpić co najwyżej $d$ etykiet o długości $k$.",
+        "correct": false
+      },
+      {
+        "text": "Graf de Bruijna $B(d,k)$ zawiera $k^d$ łuków.",
+        "correct": false
+      },
+      {
+        "text": "Graf de Bruijna $B(d,k)$ zawiera $k^d$ wierzchołków.",
+        "correct": false
+      },
+      {
+        "text": "Graf de Bruijna $B(d,k)$ zawiera $d^k$ wierzchołków.",
         "correct": true
       }
     ],
@@ -3002,330 +3350,810 @@
   },
   {
     "id": 87,
-    "question": "Zaznacz zdania prawdziwe (NWW):",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania prawdziwe.",
     "options": [
       {
-        "text": "$\\text{lcm}(a,b) = \\frac{ab}{\\gcd(a,b)}$",
+        "text": "Funkcja $f(x) = a_0 + a_1x + a_2x^2 + a_3x^3 + \\dots = \\sum_{i=0}^{\\infty} a_i x^i$ jest wykładniczą funkcją tworzącą sekwencji liczb rzeczywistych $a_0, a_1, a_2, a_3, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "Funkcja $f(x) = a_0^0 + a_1 x^1 + a_2 x^2 + a_3 x^3 + \\dots = \\sum_{i=0}^{\\infty} a_i x^i$ jest wykładniczą funkcją tworzącą sekwencji liczb rzeczywistych $a_0 x_0, a_1 x_1, a_2 x_2, a_3 x_3, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "Funkcja $f(x) = \\frac{1}{a_0} + \\frac{x}{a_1} + \\frac{2! x^2}{a_2} + \\frac{3! x^3}{a_3} + \\dots = \\sum_{i=0}^{\\infty} \\frac{i! x^i}{a_i}$ jest wykładniczą funkcją tworzącą sekwencji liczb rzeczywistych $a_0, a_1, a_2, a_3, \\dots$.",
+        "correct": false
+      },
+      {
+        "text": "Funkcja $f(x) = a_0 + a_1x + a_2x^2 + a_3x^3 + \\dots = \\sum_{i=0}^{\\infty} a_i x^i$ jest funkcją tworzącą sekwencji liczb rzeczywistych $a_0, a_1, a_2, a_3, \\dots$.",
+        "correct": true
+      },
+      {
+        "text": "Funkcja $f(x) = a_0 + a_1x + \\frac{a_2 x^2}{2!} + \\frac{a_3 x^3}{3!} + \\dots = \\sum_{i=0}^{\\infty} \\frac{a_i x^i}{i!}$ jest wykładniczą funkcją tworzącą sekwencji liczb rzeczywistych $a_0, a_1, a_2, a_3, \\dots$.",
         "correct": true
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 88,
-    "question": "Funkcja totient Eulera:",
+    "question": "Wśród poniższych zdań wskaż definicje odpowiednich relacji.",
     "options": [
       {
-        "text": "$\\phi(n)$ jest liczbą dodatnich liczb całkowitych nie większych od $n$ i względnie pierwszych z $n$.",
+        "text": "Relację $\\rho \\subset X \\times X$ nazywamy spójną wtedy i tylko wtedy, gdy warunki $\\langle x, y \\rangle \\in \\rho$ i $\\langle y, z \\rangle \\in \\rho$ implikują warunek $\\langle x, z \\rangle \\in \\rho$ dla każdych trzech elementów $x, y, z$ zbioru $X$.",
+        "correct": false
+      },
+      {
+        "text": "Relację $\\rho \\subset X \\times X$ nazywamy symetryczną wtedy i tylko wtedy, gdy z warunku $\\langle x, y \\rangle \\in \\rho$ wynika warunek $\\langle y, x \\rangle \\in \\rho$ dla każdego $x, y \\in X$.",
         "correct": true
+      },
+      {
+        "text": "Relację $\\rho \\subset X \\times X$ nazywamy zwrotną wtedy i tylko wtedy, gdy dla każdego $x \\in X$ spełniony jest warunek $\\langle x, x \\rangle \\notin \\rho$.",
+        "correct": false
+      },
+      {
+        "text": "Relację $\\rho \\subset X \\times X$ nazywamy antysymetryczną wtedy i tylko wtedy, gdy warunki $\\langle x, y \\rangle \\in \\rho$ i $\\langle y, x \\rangle \\in \\rho$ pociągają za sobą warunek $x = y$ dla każdej pary $x, y$ elementów zbioru $X$.",
+        "correct": true
+      },
+      {
+        "text": "Relację $\\rho \\subset X \\times X$ nazywamy przeciwzwrotną wtedy i tylko wtedy, gdy dla każdego $x \\in X$ spełniony jest warunek $\\langle x, x \\rangle \\in \\rho$.",
+        "correct": false
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 89,
-    "question": "Małe twierdzenie Fermata:",
+    "question": "Wśród poniższych zdań wskaż definicje odpowiednich funkcji.",
     "options": [
       {
-        "text": "Jeżeli $p$ jest liczbą pierwszą i $\\gcd(a,p) = 1$, to $a^{p-1} \\equiv 1 \\mod p$.",
+        "text": "Funkcję różnowartościową $f: X \\to Y$, która przekształca zbiór $X$ w zbiór $Y$ nazywamy przekształceniem wzajemnie jednoznacznym zbioru $Y$ na zbiór $X$.",
+        "correct": false
+      },
+      {
+        "text": "Funkcję różnowartościową $f: X \\to Y$, która przekształca zbiór $X$ w zbiór $Y$ nazywamy przekształceniem wzajemnie jednoznacznym zbioru $X$ na zbiór $Y$.",
         "correct": true
+      },
+      {
+        "text": "Funkcją odwrotną do funkcji $f: X \\to Y$ jest taka funkcja $f^{-1}$, która każdemu elementowi $y \\in Y$ przyporządkowuje element $x \\in X$ taki, że $f(x) = x$.",
+        "correct": false
+      },
+      {
+        "text": "Funkcją odwrotną do funkcji $f: X \\to Y$ jest taka funkcja $f^{-1}$, która każdemu elementowi $y \\in Y$ przyporządkowuje element $x \\in X$ taki, że $f(x) = y$.",
+        "correct": true
+      },
+      {
+        "text": "Funkcją odwrotną do funkcji $f: X \\to Y$ jest taka funkcja $f^{-1}$, która każdemu elementowi $y \\in Y$ przyporządkowuje element $x \\in X$ taki, że $f(x) = y^{-1}$.",
+        "correct": false
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 90,
-    "question": "Wielkie twierdzenie Fermata:",
+    "question": "Niech $a, b, c \\in \\mathbb{Z}$. Wśród poniższych zdań wskaż wszystkie zdania prawdziwe.",
     "options": [
       {
-        "text": "Równanie $x^n + y^n = z^n$ nie ma rozwiązań całkowitych dodatnich dla $n > 2$.",
+        "text": "$[(a|b) \\land (a|c)] \\Rightarrow a|(bx + cy)$ dla wszystkich $x, y \\in \\mathbb{Z}$.",
+        "correct": true
+      },
+      {
+        "text": "$a|b \\Rightarrow a|x^b$ dla każdego $x \\in \\mathbb{Z}$.",
+        "correct": false
+      },
+      {
+        "text": "$[(a|b) \\land (a|c)] \\Rightarrow (bx + cy)|a$ dla wszystkich $x, y \\in \\mathbb{Z}$.",
+        "correct": false
+      },
+      {
+        "text": "$[(a|b) \\land (b|c)] \\Rightarrow c|a$.",
+        "correct": false
+      },
+      {
+        "text": "Jeżeli $x = y + z$ dla pewnych $x, y, z \\in \\mathbb{Z}$ oraz $a$ dzieli dwie z trzech liczb $x, y, z$, to $a$ dzieli również trzecią z tych liczb.",
         "correct": true
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 91,
-    "question": "Zaznacz zdania prawdziwe (notacja asymptotyczna):",
+    "question": "Wybierz wszystkie poprawne:",
     "options": [
       {
-        "text": "Jeśli $f(n) = O(g(n))$, to istnieją stałe $c$ i $n_0$ takie, że dla $n \\geq n_0$ zachodzi $f(n) \\leq c \\cdot g(n)$.",
+        "text": "Turniej z udziałem $n$ graczy oznaczonych kolejnymi liczbami całkowitymi dodatnimi $1, 2, \\dots, n$ jest zbiorem $\\binom{n}{2}$ uporządkowanych par zawodników, przy czym dla $1 \\leq i < j \\leq n$ w turnieju występuje albo para $(i, j)$ albo para $(j, i)$.",
         "correct": true
+      },
+      {
+        "text": "Turniej z udziałem $n$ graczy oznaczonych kolejnymi liczbami całkowitymi dodatnimi $1, 2, \\dots, n$ jest posortowaną listą zawodników.",
+        "correct": false
+      },
+      {
+        "text": "Turniej z udziałem $n$ graczy oznaczonych kolejnymi liczbami całkowitymi dodatnimi $1, 2, \\dots, n$ jest zbiorem $\\binom{n}{2}$ nieuporządkowanych par zawodników.",
+        "correct": false
+      },
+      {
+        "text": "Turniej z udziałem $n$ graczy oznaczonych kolejnymi liczbami całkowitymi dodatnimi $1, 2, \\dots, n$ jest zbiorem $\\binom{n}{3}$ nieuporządkowanych trójek zawodników.",
+        "correct": false
+      },
+      {
+        "text": "Turniej z udziałem $n$ graczy oznaczonych kolejnymi liczbami całkowitymi dodatnimi $1, 2, \\dots, n$ jest zbiorem wszystkich zawodników.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 92,
-    "question": "Zaznacz zdania prawdziwe (złożoność obliczeniowa):",
+    "question": "Wśród poniższych zdań wskaż reguły podstawiania.",
     "options": [
       {
-        "text": "Złożoność obliczeniowa algorytmu sortowania bąbelkowego wynosi $O(n^2)$.",
+        "text": "Jeżeli zdanie złożone $P$ jest zdaniem sprzecznym i wszystkie wystąpienia pewnej zmiennej $p$ (zdania składowego) występującej w zdaniu $P$ zastąpimy zdaniem $R$, to otrzymane zdanie złożone $P_1$ będzie tautologią.",
+        "correct": false
+      },
+      {
+        "text": "Jeżeli zdanie złożone $P$ zawiera zdanie $Q$, $R$ jest zdaniem takim, że $Q \\Leftrightarrow R$ i jeśli w $P$ zastąpimy jedno lub więcej wystąpień $Q$ przez $R$, to otrzymamy zdanie złożone $P_1$ takie, że $P \\Leftrightarrow P_1$.",
+        "correct": true
+      },
+      {
+        "text": "Jeżeli zdanie złożone $P$ zawiera zdanie $Q$, $R$ jest zdaniem takim, że $R \\Rightarrow Q$ i w $P$ zastąpimy dokładnie jedno wystąpienie $Q$ przez $R$, to otrzymamy zdanie złożone $P_1$ takie, że $P \\Leftrightarrow P_1$.",
+        "correct": false
+      },
+      {
+        "text": "Jeżeli zdanie złożone $P$ zawiera zdanie $Q$, $R$ jest zdaniem takim, że $Q \\Rightarrow R$ i w $P$ zastąpimy dokładnie jedno wystąpienie $Q$ przez $R$, to otrzymamy zdanie złożone $P_1$ takie, że $P \\Leftrightarrow P_1$.",
+        "correct": false
+      },
+      {
+        "text": "Jeżeli zdanie złożone $P$ jest tautologią i wszystkie wystąpienia pewnej zmiennej $p$ (zdania składowego) występującej w zdaniu $P$ zastąpimy zdaniem $R$, to otrzymane zdanie złożone $P_1$ będzie również tautologią.",
         "correct": true
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 93,
-    "question": "Twierdzenie Halla (o ślubach):",
+    "question": "Wśród poniższych zdań wskaż wszystkie zdania będące definicjami odpowiednich zbiorów.",
     "options": [
       {
-        "text": "Graf dwudzielny $G=(V_1,V_2,E)$ ma dopasowanie nasycające $V_1$ wtedy i tylko wtedy, gdy dla każdego $S \\subseteq V_1$ zachodzi $|N(S)| \\geq |S|$.",
+        "text": "Dla danej funkcji $g(n)$ oznaczamy przez $O(g(n))$ następujący zbiór funkcji: $O(g(n)) = \\{ f(n) :$ istnieją dodatnie stałe $c$ i $n_0$ takie, że $0 \\leq f(n) \\leq c g(n)$ dla wszystkich $n \\geq n_0 \\}$.",
         "correct": true
+      },
+      {
+        "text": "Dla danej funkcji $g(n)$ oznaczamy przez $O(g(n))$ następujący zbiór funkcji: $O(g(n)) = \\{ f(n) :$ istnieją dodatnie stałe $c$ i $n_0$ takie, że $0 \\leq f(n) \\leq c g(n)$ dla wszystkich $n \\leq n_0 \\}$.",
+        "correct": false
+      },
+      {
+        "text": "Dla danej funkcji $g(n)$ oznaczamy przez $\\Omega(g(n))$ następujący zbiór funkcji: $\\Omega(g(n)) = \\{ f(n) :$ istnieją dodatnie stałe $c$ i $n_0$ takie, że $0 \\leq c g(n) \\leq f(n)$ dla wszystkich $n \\geq n_0 \\}$.",
+        "correct": true
+      },
+      {
+        "text": "Dla danej funkcji $g(n)$ oznaczamy przez $\\Omega(g(n))$ następujący zbiór funkcji: $\\Omega(g(n)) = \\{ f(n) :$ istnieją dodatnie stałe $c$ i $n_0$ takie, że $0 \\leq f(n) \\leq c g(n)$ dla wszystkich $n \\geq n_0 \\}$.",
+        "correct": false
+      },
+      {
+        "text": "Dla danej funkcji $g(n)$ oznaczamy przez $\\Omega(g(n))$ następujący zbiór funkcji: $\\Omega(g(n)) = \\{ f(n) :$ istnieją dodatnie stałe $c$ i $n_0$ takie, że $0 \\leq c g(n) \\leq f(n)$ dla wszystkich $n \\leq n_0 \\}$.",
+        "correct": false
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 94,
-    "question": "Drzewo binarne:",
+    "question": "Wśród poniższych zdań wskaż zdania prawdziwe.",
     "options": [
       {
-        "text": "Drzewo binarne o $n$ węzłach wewnętrznych ma $n+1$ liści.",
+        "text": "Dla każdego drzewa $G = (V, E)$ zachodzi $|V| = |E| - 1$.",
+        "correct": false
+      },
+      {
+        "text": "Graf nieskierowany $G = (V, E)$ jest spójny wtedy i tylko wtedy, gdy posiada drzewo rozpinające.",
         "correct": true
+      },
+      {
+        "text": "W drzewie $G = (V, E)$ między każdą parą wierzchołków $x, y \\in V$ istnieją co najmniej dwie ścieżki.",
+        "correct": false
+      },
+      {
+        "text": "W drzewie $G = (V, E)$ między każdą parą wierzchołków $x, y \\in V$ istnieje dokładnie jedna ścieżka.",
+        "correct": true
+      },
+      {
+        "text": "Drzewo $G = (V, E)$ takie, że $|V| \\geq 2$, ma co najmniej trzy wierzchołki o stopniu równym 1.",
+        "correct": false
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 95,
-    "question": "Kody prefiksowe:",
+    "question": "Niech dana będzie przestrzeń $U$ oraz pewien jej podzbiór $A$. Wśród poniższych zdań wskaż wszystkie zdania prawdziwe.",
     "options": [
       {
-        "text": "W kodzie prefiksowym żadne słowo kodowe nie jest prefiksem innego słowa kodowego.",
+        "text": "Zbiór potęgowy zbioru $A$ jest to zbiór wszystkich podzbiorów zbioru $A$.",
         "correct": true
+      },
+      {
+        "text": "Dopełnienie zbioru $A$ jest to zbiór $A \\setminus U$.",
+        "correct": false
+      },
+      {
+        "text": "Dopełnienie zbioru $A$ jest to zbiór $A \\cup U$.",
+        "correct": false
+      },
+      {
+        "text": "Dopełnienie zbioru $A$ jest to zbiór $A \\cap U$.",
+        "correct": false
+      },
+      {
+        "text": "Zbiór potęgowy zbioru $A$ jest to zbiór zawierający te elementy przestrzeni $U$, które nie należą do $A$.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 96,
-    "question": "Kod Huffmana:",
+    "question": "Niech $p$ i $q$ będą zdaniami logicznymi prostymi, $T_0$ niech będzie dowolną tautologią, a $F_0$ dowolnym zdaniem sprzecznym. Wśród poniższych par zdań wskaż zdania logicznie równoważne.",
     "options": [
       {
-        "text": "Kod Huffmana to optymalny kod prefiksowy minimalizujący średnią długość słowa kodowego.",
+        "text": "$p \\rightarrow q, \\neg p \\lor q$",
         "correct": true
+      },
+      {
+        "text": "$p \\land F_0, p$",
+        "correct": false
+      },
+      {
+        "text": "$p \\lor T_0, p$",
+        "correct": false
+      },
+      {
+        "text": "$p \\land F_0, F_0$",
+        "correct": true
+      },
+      {
+        "text": "$p \\land T_0, \\neg p$",
+        "correct": false
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 97,
-    "question": "Zaznacz zdania prawdziwe (grafy planarne):",
+    "question": "Niech $A, B$ i $C$ będą podzbiorami pewnej przestrzeni $U$. Wśród poniższych zdań wskaż prawa algebry zbiorów.",
     "options": [
       {
-        "text": "Graf jest planarny, jeśli może być narysowany na płaszczyźnie bez przecinania się krawędzi.",
+        "text": "$\\overline{A \\cap B} = \\overline{A} \\cap \\overline{B}$",
+        "correct": false
+      },
+      {
+        "text": "$(A \\cap B) \\cap C = A \\cup (B \\cap C)$",
+        "correct": false
+      },
+      {
+        "text": "$A \\cup (A \\cap B) = A$",
+        "correct": true
+      },
+      {
+        "text": "$A \\cap (A \\cup B) = \\overline{A}$",
+        "correct": false
+      },
+      {
+        "text": "$\\overline{A \\cup B} = \\overline{A} \\cap \\overline{B}$",
         "correct": true
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 98,
-    "question": "Wzór Eulera dla grafów planarnych:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Dla spójnego grafu planarnego zachodzi $V - E + F = 2$, gdzie $V$ to wierzchołki, $E$ krawędzie, $F$ ściany.",
+        "text": "Wszystkie $k$-elementowe kombinacje bez powtórzeń z $n$-elementowego zbioru, dla $k = 0, \\ldots, n$, mogą być wygenerowane za pomocą generacji wszystkich liczb binarnych z zakresu od $1$ do $2^n$.",
+        "correct": false
+      },
+      {
+        "text": "Każde rozmieszczenie $k$ identycznych elementów w $n$ rozróżnialnych pudełkach odpowiada $k$-elementowej kombinacji bez powtórzeń ze zbioru $n$-elementowego.",
+        "correct": false
+      },
+      {
+        "text": "Z każdej $k$-elementowej kombinacji bez powtórzeń ze zbioru $n$-elementowego można utworzyć $k!$ różnych $k$-wyrazowych wariacji bez powtórzeń ze zbioru $n$-elementowego.",
         "correct": true
+      },
+      {
+        "text": "Liczba wszystkich $k$-elementowych kombinacji bez powtórzeń ze zbioru $n$-elementowego wynosi $\\binom{n}{k}$, gdzie $n \\leq k < n$.",
+        "correct": false
+      },
+      {
+        "text": "Każda $k$-elementowa kombinacja bez powtórzeń ze zbioru $n$-elementowego odpowiada pewnemu podziałowi tego zbioru na $k$ podzbiorów.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 99,
-    "question": "Graf pełny $K_5$ i $K_{3,3}$:",
+    "question": "Obiekty $|A, C, D|$ i $|B, E, F|$ utworzono ze zbioru $\\{A, B, C, D, E, F\\}$. Kolejność tych obiektów oraz uporządkowanie ich elementów nie jest istotna. Obiekty te są przykładem:",
     "options": [
       {
-        "text": "Grafy $K_5$ i $K_{3,3}$ nie są planarne.",
+        "text": "podziału uporządkowanego zbioru $\\{A, B, C, D, E, F\\}$, ponieważ elementy w obiektach są ustawione alfabetycznie.",
+        "correct": false
+      },
+      {
+        "text": "podziału zbioru $\\{A, B, C, D, E, F\\}$ na dwa podzbiory.",
         "correct": true
+      },
+      {
+        "text": "dwóch 3-elementowych wariacji bez powtórzeń ze zbioru 6-elementowego.",
+        "correct": false
+      },
+      {
+        "text": "dwóch 3-elementowych permutacji bez powtórzeń ze zbioru 6-elementowego.",
+        "correct": false
+      },
+      {
+        "text": "dwóch 3-elementowych permutacji z powtórzeniami, w których poszczególne elementy występują tylko jeden raz.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 100,
-    "question": "Twierdzenie Kuratowskiego:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Graf jest planarny wtedy i tylko wtedy, gdy nie zawiera podgrafu homeomorficznego z $K_5$ lub $K_{3,3}$.",
+        "text": "$k$-wyrazową permutacją z powtórzeniami ze zbioru $n$-elementowego nazywamy każdy $k$-wyrazowy ciąg mogących się powtarzać elementów tego zbioru.",
+        "correct": false
+      },
+      {
+        "text": "Permutacja z powtórzeniami może być interpretowana jako dowolne rozmieszczenie $n$ rozróżnialnych obiektów w $k$ rozróżnialnych pudełkach.",
+        "correct": false
+      },
+      {
+        "text": "$k$-wyrazowe permutacje z powtórzeniami są równoważne $k$-wyrazowym wariacjom z powtórzeniami",
+        "correct": false
+      },
+      {
+        "text": "Liczba $n$-wyrazowych permutacji z powtórzeniami jest nie większa niż liczba $n$-wyrazowych permutacji bez powtórzeń.",
         "correct": true
+      },
+      {
+        "text": "W $n$-elementowej permutacji z powtórzeniami ze zbioru $\\{a_1, \\ldots, a_n\\}$, w której element $a_i$ powtarza się $n_i$ razy, dla $i = 1, \\ldots, k$, zachodzi: $\\sum_{i=1}^{k} n_i = n!$.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 101,
-    "question": "Kolorowanie grafu:",
+    "question": "3 identyczne elementy mogą być wrzucone w dowolny sposób do 6 rozróżnialnych pudełek na",
     "options": [
       {
-        "text": "Liczba chromatyczna $\\chi(G)$ to minimalna liczba kolorów potrzebna do pokolorowania wierzchołków grafu tak, aby sąsiednie wierzchołki miały różne kolory.",
+        "text": "$\\binom{6}{3}$ sposobów.",
+        "correct": false
+      },
+      {
+        "text": "$6^3$ sposobów.",
+        "correct": false
+      },
+      {
+        "text": "$3^6$ sposobów.",
+        "correct": false
+      },
+      {
+        "text": "$\\binom{6+3-1}{3}$ sposobów.",
         "correct": true
+      },
+      {
+        "text": "$\\frac{6!}{3!}$ sposobów.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 102,
-    "question": "Twierdzenie o czterech barwach:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Każdy graf planarny można pokolorować co najwyżej czterema kolorami.",
+        "text": "Pierwsza zasada indukcji matematycznej dla pewnego $n_0 \\in \\mathbb{Z}^{+}$ ma postać: $[S(n_0) \\land [\\forall_{k \\geq 1} [S(k) \\implies S(k+1)]]] \\implies \\forall_{n \\geq 1} S(n)$.",
+        "correct": false
+      },
+      {
+        "text": "Pierwszą zasadę indukcji matematycznej stosuje się do dowodzenia twierdzeń, w których prawdziwość pewnego zdania wynika z prawdziwości jednego, dowolnego ze zdań poprzedzających.",
+        "correct": false
+      },
+      {
+        "text": "Pierwsza zasada indukcji matematycznej dla $n_0 = 1$ ma postać: $[(\\forall_{k \\geq 1} [S(k) \\implies S(k + 1)]) \\land S(1)] \\implies \\forall_{n \\in \\mathbb{Z}^{+}} S(n)$.",
         "correct": true
+      },
+      {
+        "text": "Zasada indukcji matematycznej może być wykorzystana do dowodzenia twierdzeń dotyczących dowolnych liczb dodatnich.",
+        "correct": false
+      },
+      {
+        "text": "Jeśli pewne twierdzenie $\\forall_{n \\in \\mathbb{Z}^{+}} S(n)$ nie jest prawdziwe dla pewnych początkowych wartości $n \\geq 1$, to może ono być udowodnione z wykorzystaniem drugiej zasady indukcji matematycznej.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 103,
-    "question": "Zbiór niezależny:",
+    "question": "Pierwsza i druga zasada indukcji matematycznej:",
     "options": [
       {
-        "text": "Zbiór niezależny w grafie to zbiór wierzchołków, z których żadne dwa nie są sąsiednie.",
+        "text": "są równoważne.",
         "correct": true
+      },
+      {
+        "text": "nie są równoważne.",
+        "correct": false
+      },
+      {
+        "text": "są równoważne jedynie dla twierdzeń dotyczących liczb naturalnych.",
+        "correct": false
+      },
+      {
+        "text": "mogą być zastosowane do dowodzenia twierdzeń dotyczących liczb rzeczywistych dodatnich.",
+        "correct": false
+      },
+      {
+        "text": "są technikami dowodzenia twierdzeń dotyczących wyłącznie zależności rekurencyjnych jednorodnych.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 104,
-    "question": "Klika w grafie:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Klika to maksymalny podzbiór wierzchołków grafu, w którym każde dwa wierzchołki są połączone krawędzią.",
+        "text": "Druga zasada indukcji matematycznej dla dowolnych $n_0, n_1 \\in \\mathbb{Z}^+$, $n_0 \\leq n_1$, ma postać: $[[S(1) \\land S(2) \\land \\ldots \\land S(n_1)] \\land [\\forall_{k \\geq n_0} [[S(1) \\land S(2) \\land \\ldots \\land S(k)] \\Rightarrow S(k+1)]]] \\Rightarrow \\forall_{n \\geq n_1} S(n)$",
+        "correct": false
+      },
+      {
+        "text": "Druga zasada indukcji matematycznej jest wykorzystywana do dowodzenia twierdzeń postaci: $\\forall_{n \\in \\mathbb{Z}^+} S(n)$, takich że zdanie $S(n)$ nie jest prawdziwe dla pewnych początkowych wartości $n \\in \\mathbb{Z}^+$.",
+        "correct": false
+      },
+      {
+        "text": "Druga zasada indukcji matematycznej dla $n_0 = 1$, $n_1 \\geq 1$ ma postać: $\\left[ \\forall_{k \\geq n_1} [[ S(1) \\land S(2) \\land \\ldots \\land S(k) ] \\Rightarrow S(k+1)] \\land [S(1) \\land S(2) \\land \\ldots \\land S(n_1)] \\right] \\Rightarrow \\forall_{n \\geq n_1} S(n)$",
         "correct": true
+      },
+      {
+        "text": "Jeśli w dowodzie kroku indukcyjnego wykorzystuje się założenie o prawdziwości tylko jednego ze zdań $S(x)$ poprzedzających zdanie $S(k+1)$, $x \\leq k$, to w pierwszej zasadzie twierdzenia wystarczy pierwsza zasada indukcji matematycznej.",
+        "correct": false
+      },
+      {
+        "text": "W pierwszej zasadzie indukcji matematycznej z prawdziwości warunku początkowego lub kroku indukcyjnego wynika prawdziwość hipotezy indukcyjnej.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 105,
-    "question": "Pokrycie wierzchołkowe:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Pokrycie wierzchołkowe grafu to zbiór wierzchołków taki, że każda krawędź grafu ma co najmniej jeden koniec w tym zbiorze.",
+        "text": "Rozwiązanie liniowej jednorodnej zależności rekurencyjnej rzędu pierwszego ze stałymi współczynnikami postaci $a_n = ca_0^n$, $c$ oznacza pewną stałą i $n \\in \\mathbb{N}$.",
+        "correct": false
+      },
+      {
+        "text": "Rozwiązanie zależności liniowej jednorodnej rzędu drugiego ze stałymi współczynnikami o równaniu charakterystycznym o pierwiastku podwójnym ma postać $a_n = c_1 r^n + c_2 n r^n$, gdzie $c_1$ i $c_2$ są wyznaczane w oparciu o początkowe elementy ciągu.",
+        "correct": false
+      },
+      {
+        "text": "Pełna definicja ciągu opisanego zależnością rekurencyjną rzędu $k$-tego musi zawierać wartości $k$ kolejnych (np. początkowych) elementów tego ciągu.",
         "correct": true
+      },
+      {
+        "text": "Zależność rekurencyjna postaci $c_{n} a_{n} + c_{n-1} a_{n-1} + \\ldots + c_k a_{k} = 0$, gdzie $c_{i}$ dla $i = n, \\ldots, k$ są pewnymi stałymi rzeczywistymi, $c_{n} \\neq 0$ i $c_{k} \\neq 0$ nazywamy liniową jednorodną zależnością rekurencyjną rzędu k-tego ze stałymi współczynnikami.",
+        "correct": false
+      },
+      {
+        "text": "Każdy pierwiastek pojedynczy $r$ równania charakterystycznego wprowadza do rozwiązania liniowej jednorodnej zależności rekurencyjnej ze stałymi współczynnikami rzędu $k \\geq 2$ czynnik $r c^n$, gdzie $c$ jest pewną stałą, którą można wyznaczyć w oparciu o początkowe wyrazy ciągu.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 106,
-    "question": "Twierdzenie Ramseya:",
+    "question": "Zależność rekurencyjna $(a_0 = 0, a_1 = 3, a_2 = 4, a_{n+1} = 3a_{n-2} = 3n \\text{ dla } n \\geq 2)$ jest zależnością rekurencyjną:",
     "options": [
       {
-        "text": "Dla każdych liczb naturalnych $r$ i $s$ istnieje liczba $R(r,s)$ taka, że każdy graf o co najmniej $R(r,s)$ wierzchołkach zawiera klikę rozmiaru $r$ lub zbiór niezależny rozmiaru $s$.",
+        "text": "liniową ze stałymi współczynnikami rzędu trzeciego niejednorodną.",
         "correct": true
+      },
+      {
+        "text": "liniową ze stałymi współczynnikami rzędu drugiego jednorodną.",
+        "correct": false
+      },
+      {
+        "text": "liniową ze stałymi współczynnikami rzędu drugiego niejednorodną.",
+        "correct": false
+      },
+      {
+        "text": "liniową ze stałymi współczynnikami rzędu pierwszego jednorodną.",
+        "correct": false
+      },
+      {
+        "text": "liniową ze stałymi współczynnikami rzędu trzeciego jednorodną.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 107,
-    "question": "Ciąg graficzny:",
+    "question": "Zależność rekurencyjna $(a_0 = 1, a_1 = 2, na_{n} + 3a_{n-1} - a_{n-2} = 0 \\text{ dla } n \\geq 2)$ jest zależnością:",
     "options": [
       {
-        "text": "Ciąg liczb całkowitych nieujemnych jest ciągiem graficznym, jeśli istnieje graf prosty o tym ciągu jako ciągu stopni wierzchołków.",
+        "text": "niejednorodną.",
+        "correct": false
+      },
+      {
+        "text": "dla której równanie charakterystyczne jest równaniem kwadratowym.",
+        "correct": false
+      },
+      {
+        "text": "nieliniową.",
         "correct": true
+      },
+      {
+        "text": "która nie może być rozwiązywana metodą równania charakterystycznego.",
+        "correct": true
+      },
+      {
+        "text": "dla której równanie charakterystyczne jest równaniem stopnia trzeciego.",
+        "correct": false
       }
     ],
-    "multiple": false
+    "multiple": true
   },
   {
     "id": 108,
-    "question": "Twierdzenie Erdősa-Gallaia:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Ciąg $(d_1, d_2, ..., d_n)$ jest ciągiem graficznym wtedy i tylko wtedy, gdy suma stopni jest parzysta i spełnione są odpowiednie nierówności.",
+        "text": "Liczby Stirlinga drugiego rodzaju opisujące liczbę sposobów podziału zbioru $n$-elementowego na $k$ niepustych rozłącznych podzbiorów są nie większe niż liczby Stirlinga pierwszego rodzaju opisujące liczbę sposobów rozmieszczenia $n$ elementów w $k$ niepustych cyklach.",
         "correct": true
+      },
+      {
+        "text": "Definicja rekurencyjna liczb Stirlinga drugiego rodzaju zawiera zależność postaci: $S(n, k) = S(n-1, k) + k \\cdot S(n-1, k-1)$, a definicja rekurencyjna liczb Stirlinga pierwszego rodzaju: $s(n, k) = s(n-1, k) + (n-1) \\cdot s(n-1, k-1)$ $(\\text{gdzíe n} > 0, k > 0)$.",
+        "correct": false
+      },
+      {
+        "text": "Liczby Eulera drugiego rzędu $\\left\\langle\\left\\langle  {n \\atop k} \\right\\rangle\\right\\rangle$ oznaczają liczbę permutacji z powtórzeniami multizbioru $\\{1, 1, 2, 2, \\ldots, k, k\\}$ zawierających $n$ wzniesień.",
+        "correct": false
+      },
+      {
+        "text": "Liczby harmoniczne pierwszego rzędu tworzą ciąg zbieżny do pewnej granicy, ponieważ zgodnie z definicją rekurencyjną każda kolejna liczba $H_{n+1}$ powstaje z poprzedniej liczby $H_n$ przez dodanie ułamka $\\frac{1}{n+1}$.",
+        "correct": false
+      },
+      {
+        "text": "W systemie liczbowym Fibonacciego, zbudowanym w oparciu o twierdzenie Zeckendorfa, do jednoznacznej reprezentacji liczb całkowitych dodatnich wykorzystuje się wszystkie liczby Fibonacciego $F_k$, dla $k \\geq 0$.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 109,
-    "question": "Graf regularny:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Graf regularny to graf, w którym wszystkie wierzchołki mają ten sam stopień.",
+        "text": "Liczby harmoniczne rzędu $r$, dla $r > 1$, tworzą ciąg rozbieżny.",
+        "correct": false
+      },
+      {
+        "text": "W ciągu liczby Stirlinga drugiego rodzaju mogą pojawić się liczby niebędące liczbami całkowitymi.",
+        "correct": false
+      },
+      {
+        "text": "Każdej $n$-elementowej permutacji bez powtórzeń ze zbioru $n$-elementowego odpowiada pewien układ cykli i każdemu układowi cykli odpowiada pewna $n$-elementowa permutacja bez powtórzeń ze zbioru $n$-elementowego.",
         "correct": true
+      },
+      {
+        "text": "Liczby Fibonacciego są liczbami opisanymi zależnością rekurencyjną rzędu trzeciego, ponieważ w definicji występują trzy elementy ciągu.",
+        "correct": false
+      },
+      {
+        "text": "Liczby Eulera związane są z liczbą cykli Eulera w grafie.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 110,
-    "question": "Graf Petersena:",
+    "question": "Poprawna zasada włączania i wyłączania dla 3 dowolnych zbiorów ma postać:",
     "options": [
       {
-        "text": "Graf Petersena jest grafem 3-regularnym o 10 wierzchołkach i 15 krawędziach.",
+        "text": "$|A_1 \\cap A_2 \\cap A_3| = |A_1| \\cdot |A_2| \\cdot |A_3|$",
+        "correct": false
+      },
+      {
+        "text": "$|A_1 \\cup A_2 \\cup A_3| = |A_1| + |A_2| + |A_3| - |A_1 \\cup A_2| - |A_1 \\cup A_3| - |A_2 \\cup A_3| + |A_1 \\cup A_2 \\cup A_3|$",
+        "correct": false
+      },
+      {
+        "text": "$|A_1 \\cup A_2 \\cup A_3| = |A_1| + |A_2| + |A_3| - |A_1 \\cap A_2| - |A_1 \\cap A_3| - |A_2 \\cap A_3| + |A_1 \\cup A_2 \\cup A_3|$",
+        "correct": false
+      },
+      {
+        "text": "$|A_1 \\cup A_2 \\cup A_3| = |A_1| + |A_2| + |A_3| - |A_1 \\cap A_2| - |A_1 \\cap A_3| - |A_2 \\cap A_3| + |A_1 \\cap A_2 \\cap A_3|$",
         "correct": true
+      },
+      {
+        "text": "$|A_1 \\cup A_2 \\cup A_3| = |A_1| + |A_2| + |A_3| - |A_1 \\cap A_2 \\cap A_3|$",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 111,
-    "question": "Drzewo rozpinające:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Drzewo rozpinające grafu $G$ to podgraf $G$ będący drzewem zawierającym wszystkie wierzchołki $G$.",
+        "text": "Zasada włączania i wyłączania mówi, że liczba elementów pewnego zbioru $S$, $|S| = N$, które nie spełniają żadnego z warunków $c_i$, $1 \\leq i \\leq t$, jest równa $N = N - N(c_1) - N(c_2) - ... - N(c_t)$, gdzie $N(c_i)$ oznacza liczbę elementów $S$ spełniających warunek $c_i$.",
+        "correct": false
+      },
+      {
+        "text": "Zasada włączania i wyłączania dla zbioru $S$ i warunków $c_i$, $1 \\leq i \\leq t$, spełnionych przez pewne elementy ze zbioru $S$ ma postać: $N(\\overline{c_1, c_2, \\dots, c_t}) = |S| - \\sum_{1 \\leq i \\leq t} N(c_i) + \\sum_{1 \\leq i < j \\leq t} N(c_i, c_j) - \\sum_{1 \\leq i < j < k \\leq t} N(c_i, c_j, c_k) + ... + (-1)^t N(c_1, c_2, \\dots, c_t)$.",
         "correct": true
+      },
+      {
+        "text": "Zasada włączania i wyłączania w postaci alternatywnej dotyczy pewnego zbioru $S$, dla którego zdefiniowane są warunki $c_i$, $1 \\leq i \\leq t$, które muszą być spełnione przez wszystkie elementy zbioru $S$.",
+        "correct": false
+      },
+      {
+        "text": "Symbol $N(c_i c_j)$ występujący w zasadzie włączania i wyłączania oznacza liczbę elementów ze zbioru $S$ spełniających warunki $c_i \\land c_j$ i równocześnie niespełniających pozostałych warunków $c_k$ ($1 \\leq i, j \\leq t$, $k \\neq i$, $k \\neq j$).",
+        "correct": false
+      },
+      {
+        "text": "Dowód zasady włączania i wyłączania w postaci alternatywnej jest oparty o prawa teorii mnogości.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 112,
-    "question": "Algorytm Prima i Kruskala:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Algorytmy Prima i Kruskala służą do znajdowania minimalnego drzewa rozpinającego.",
+        "text": "Zasada szufladkowa Dirichleta mówi, że jeśli skończony zbiór $S$ jest podzielony na $k$ rozłącznych niepustych podzbiorów, to każdy z tych podzbiorów zawiera $|S|/k$ elementów lub więcej.",
+        "correct": false
+      },
+      {
+        "text": "Dowód zasady szufladkowej Dirichleta wykorzystuje pojęcie uporządkowanego podziału zbioru.",
+        "correct": false
+      },
+      {
+        "text": "„Klasyczna” zasada szufladkowa Dirichleta w żaden sposób nie wynika z uogólnionej zasady szufladkowej Dirichleta, ponieważ dotyczy zbiorów o odmiennych własnościach.",
+        "correct": false
+      },
+      {
+        "text": "Z zasady szufladkowej Dirichleta wynika, że jeśli skończony zbiór $S$ jest podzielony na $k$ rozłącznych niepustych podzbiorów, to średnia liczność tych zbiorów wynosi $|S|/k$.",
         "correct": true
+      },
+      {
+        "text": "Uogólniona zasada szufladkowa Dirichleta określa wartość średniej arytmetycznej liczb elementów zbiorów $A_1, \\dots, A_k$ będących rozłącznymi podzbiorami pewnego skończonego zbioru $S$.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 113,
-    "question": "Grafy izomorficzne:",
+    "question": "Średnia liczność zbiorów $A_1, A_2, A_3, A_4, A_5$ będących podzbiorami zbioru $10$ elementowego $S$, takimi, że każdy element $S$ należy do dokładnie $4$ podzbiorów:",
     "options": [
       {
-        "text": "Dwa grafy są izomorficzne, jeśli można ustawić bijekcję między ich wierzchołkami zachowującą sąsiedztwo.",
+        "text": "wynosi dokładnie $8$.",
         "correct": true
+      },
+      {
+        "text": "wynosi dokładnie $10$.",
+        "correct": false
+      },
+      {
+        "text": "wynosi mniej niż $8$.",
+        "correct": false
+      },
+      {
+        "text": "wynosi co najmniej $10$.",
+        "correct": false
+      },
+      {
+        "text": "nie może być określona.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 114,
-    "question": "Macierz sąsiedztwa:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "W macierzy sąsiedztwa grafu nieskierowanego wartość $a_{ij} = 1$ gdy wierzchołki $i$ i $j$ są połączone krawędzią.",
+        "text": "Każda macierz o wymiarze $p \\times q$ zbudowana z elementów ze zbioru $\\{1, \\dots, n\\}$, gdzie $\\min(p, q) < n$, w której w żadnym wierszu elementy się nie powtarzają jest prostokątem łacińskim.",
+        "correct": false
+      },
+      {
+        "text": "Rozszerzanie prostokąta łacińskiego $p \\times n$ o jeden wiersz wymaga wyznaczenia dowolnego systemu różnych reprezentantów rodziny zbiorów $\\{A_1, \\dots, A_n\\}$, gdzie zbiór $A_i$ zawiera elementy dotychczas niewystępujące w kolumnie $i$ ($1 \\leq i \\leq n$).",
         "correct": true
+      },
+      {
+        "text": "Rozszerzając prostokąt łaciński $p \\times q$, do kwadratu $n \\times n$ należy w nowej kolumnie umieścić wszystkie elementy $i = 1, \\dots, n$, dla których liczba wystąpień spełnia warunek $L(i) > p + q - n$.",
+        "correct": false
+      },
+      {
+        "text": "Pewne prostokąty łacińskie $p \\times n$, w których liczba wystąpień niektórych elementów jest zbyt mała, nie mogą być rozszerzone do kwadratu łacińskiego $n \\times n$.",
+        "correct": false
+      },
+      {
+        "text": "Kwadratem grecko-łacińskim, czyli kwadratem Eulera, nazywamy złożenie dwóch dowolnych kwadratów łacińskich o takim samym rozmiarze.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 115,
-    "question": "Lista sąsiedztwa:",
+    "question": "Zaznacz zdania prawdziwe:",
     "options": [
       {
-        "text": "Lista sąsiedztwa to reprezentacja grafu, gdzie dla każdego wierzchołka przechowujemy listę jego sąsiadów.",
+        "text": "Wielomian szachowy $r_B(x) = 1 + r_1x + r_2x^2 + ... + r_kx^k + ... + r_nx^n$, to funkcja, której wartość oznacza liczbę możliwych rozmieszczeń $n$ wzajemnie nieatakujących się wież na szachownicy o wymiarze $x \\times x$.",
+        "correct": false
+      },
+      {
+        "text": "Jeśli szachownica $B$ składa się z dwóch niezależnych obszarów $C$ i $D$, to wówczas $r_B(x) = r_C(x) + r_D(x)$.",
+        "correct": false
+      },
+      {
+        "text": "Jeśli w wielomianie szachowym $r_B(x) = 1 + r_1x + r_2x^2 + ... + r_kx^k + ... + r_nx^n$ dla szachownicy $B$ o wymiarze $n \\times n$ współczynnik $r_n = 0$, to na szachownicy $B$ nie można rozmieścić $n$ wzajemnie nieatakujących się wież.",
         "correct": true
+      },
+      {
+        "text": "Dekompzycja wielomianów szachowych jest możliwa wyłącznie wówczas, jeśli daną szachownicę można podzielić na dwa rozłączne obszary niemające wspólnych wierszy ani kolumn.",
+        "correct": false
+      },
+      {
+        "text": "Szachownicę $B$ można zdekomponować, poprzez wybór pewnego pola dopuszczalnego $s$, na dwie szachownice $B^1$ i $B^2$, takie że w $B^1$ niedostępny jest wiersz, a w $B^2$ niedostępna jest kolumna zawierająca pole $s$.",
+        "correct": false
       }
     ],
     "multiple": false
   },
   {
     "id": 116,
-    "question": "BFS i DFS:",
+    "question": "Zaznacz funkcję tworzącą, która może być wielomianem szachowym pewnej szachownicy o wymiarze $5 \\times 5$:",
     "options": [
       {
-        "text": "BFS (przeszukiwanie wszerz) i DFS (przeszukiwanie w głąb) to podstawowe algorytmy przeszukiwania grafów.",
+        "text": "$r_B(x) = 2 + 7x + 16x^2 + 13x^3 + 3x^4 + 0x^5$.",
+        "correct": false
+      },
+      {
+        "text": "$r_B(x) = 1 + 7x + 16x^2 + 13x^3 + 3x^4 + 0x^5$.",
         "correct": true
+      },
+      {
+        "text": "$r_B(x) = 1 + 7x + 16x^2 + 13x^3 + 3x^4 + 1x^6$.",
+        "correct": false
+      },
+      {
+        "text": "$r_B(x) = 1 + 26x + 16x^2 + 13x^3 + 3x^4 + 0x^5$.",
+        "correct": false
+      },
+      {
+        "text": "$r_B(x) = 0 + 7x + 16x^2 + 13x^3 + 3x^4 + 0x^5$.",
+        "correct": false
       }
     ],
     "multiple": false
@@ -3339,7 +4167,17 @@
                 document.getElementById('themeIcon').textContent = '☀️';
                 document.getElementById('themeText').textContent = 'Jasny';
             }
-            setTimeout(init, 300);
+            if (localStorage.getItem('dyskretna_autoshuffle') === '1') {
+                autoShuffle = true;
+            }
+            setTimeout(() => {
+                init();
+                if (autoShuffle) {
+                    const btn = document.getElementById('autoShuffleBtn');
+                    if (btn) btn.textContent = '🔀 Auto-losuj: WŁ';
+                    shuffleQuestions();
+                }
+            }, 300);
         });
     </script>
 </body>

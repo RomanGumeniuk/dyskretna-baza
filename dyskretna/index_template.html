@@ -28,15 +28,54 @@
             --border: rgba(255, 255, 255, 0.1);
         }
         .light-mode {
-            --bg-primary: #f5f7fa;
-            --bg-secondary: #e8ecef;
-            --bg-tertiary: #dde1e4;
-            --text-primary: #2d3436;
-            --text-secondary: #636e72;
-            --text-muted: #95a5a6;
-            --card-bg: rgba(0, 0, 0, 0.03);
-            --border: rgba(0, 0, 0, 0.1);
+            --bg-primary: #f8f9fb;
+            --bg-secondary: #eef1f5;
+            --bg-tertiary: #e2e8f0;
+            --accent: #3b82f6;
+            --accent-dark: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.18);
+            --purple: #8b5cf6;
+            --purple-dark: #7c3aed;
+            --green: #22c55e;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --yellow: #eab308;
+            --text-primary: #1e293b;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --card-bg: #ffffff;
+            --border: rgba(148, 163, 184, 0.25);
         }
+        .light-mode body, .light-mode { background: linear-gradient(135deg, #f8f9fb 0%, #eef1f5 50%, #e2e8f0 100%); }
+        .light-mode .subtitle { color: #6366f1; }
+        .light-mode h1 { text-shadow: none; }
+        .light-mode .question-type { color: #6366f1; border-color: #a5b4fc; }
+        .light-mode .mode-panel h3,
+        .light-mode .quiz-type-card .title { color: #7c3aed; }
+        .light-mode .quiz-type-card { background: rgba(139, 92, 246, 0.08); border-color: rgba(139, 92, 246, 0.15); }
+        .light-mode .quiz-type-card:hover { border-color: #8b5cf6; }
+        .light-mode .quiz-type-card.selected { background: rgba(139, 92, 246, 0.18); border-color: #8b5cf6; }
+        .light-mode .custom-settings { background: rgba(59, 130, 246, 0.06); }
+        .light-mode .timer-display { background: rgba(59, 130, 246, 0.06); }
+        .light-mode .results-stat,
+        .light-mode .history-item { background: rgba(59, 130, 246, 0.06); }
+        .light-mode .page-info { color: #6366f1; }
+        .light-mode .shortcuts-hint code { background: rgba(99, 102, 241, 0.1); }
+        .light-mode .question-card { box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
+        .light-mode .question-card:hover { border-color: rgba(99, 102, 241, 0.3); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .light-mode .stat-box { background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+        .light-mode .option { background: #f8fafc; }
+        .light-mode .option:hover { background: #eff6ff; border-color: rgba(59, 130, 246, 0.3); }
+        .light-mode .option.selected { background: #eff6ff; border-color: #3b82f6; }
+        .light-mode .option.correct { background: #f0fdf4; border-color: #22c55e; }
+        .light-mode .option.incorrect { background: #fef2f2; border-color: #ef4444; }
+        .light-mode .option.missed { background: #fefce8; border-color: #eab308; }
+        .light-mode .btn-primary { color: #ffffff; }
+        .light-mode .question-number { color: #ffffff; }
+        .light-mode .mode-tab.active { color: #ffffff; }
+        .light-mode .mode-panel { border-color: #8b5cf6; }
+        .light-mode .search-box { background: #ffffff; }
+        .light-mode footer { color: #94a3b8; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -354,6 +393,7 @@
             <button class="btn-primary" onclick="checkAllAnswers()">✓ Sprawdź wszystkie</button>
             <button class="btn-secondary" onclick="resetProgress()">↻ Resetuj postęp</button>
             <button class="btn-secondary" onclick="shuffleQuestions()">🔀 Losuj kolejność</button>
+            <button class="btn-secondary" id="autoShuffleBtn" onclick="toggleAutoShuffle()">🔀 Auto-losuj: WYŁ</button>
         </div>
         
         <!-- Quiz Mode Controls -->
@@ -421,6 +461,7 @@
         let currentMode = 'learn', currentFilter = 'all', currentSearch = '', currentPage = 1, questionsPerPage = 10;
         let quizType = 'standard', quizActive = false, quizStartTime = null, quizTimeLimit = 0, timerInterval = null;
         let flashcardIndex = 0, knownCards = new Set(), flashcardQuestions = [];
+        let autoShuffle = false;
         let history = [];
         
         // === INITIALIZATION ===
@@ -732,26 +773,25 @@
         function renderQuestion(q, displayNum) {
             const isChecked = checkedQuestions.has(q.id);
             const answers = userAnswers[q.id] || [];
-            const isMultiple = q.multiple || q.options.filter(o => o.correct).length > 1;
             const isBookmarked = bookmarks.has(q.id);
             
             return `<div class="question-card ${isBookmarked ? 'bookmarked' : ''}" id="question-${q.id}">
                 <div class="question-header">
                     <span class="question-number">Pytanie ${displayNum}</span>
                     <div class="question-badges">
-                        <span class="question-type">${isMultiple ? 'Wielokrotny wybór' : 'Jednokrotny wybór'}</span>
+                        <span class="question-type">Wielokrotny wybór</span>
                         <button class="bookmark-btn" onclick="toggleBookmark(${q.id})">${isBookmarked ? '⭐' : '☆'}</button>
                     </div>
                 </div>
                 <div class="question-text">${q.question}</div>
-                <div class="options">${q.options.map((opt, idx) => renderOption(q, opt, idx, isChecked, answers, isMultiple)).join('')}</div>
+                <div class="options" id="options-${q.id}">${q.options.map((opt, idx) => renderOption(q, opt, idx, isChecked, answers)).join('')}</div>
                 <div class="question-actions">
-                    <button class="btn-primary" onclick="checkQuestion(${q.id})" style="padding: 8px 16px; font-size: 0.85em;" ${isChecked ? 'disabled' : ''}>${isChecked ? '✓ Sprawdzono' : 'Sprawdź'}</button>
+                    <button class="btn-primary" id="checkbtn-${q.id}" onclick="checkQuestion(${q.id})" style="padding: 8px 16px; font-size: 0.85em;" ${isChecked ? 'disabled' : ''}>${isChecked ? '✓ Sprawdzono' : 'Sprawdź'}</button>
                 </div>
             </div>`;
         }
         
-        function renderOption(q, opt, idx, isChecked, answers, isMultiple) {
+        function renderOption(q, opt, idx, isChecked, answers) {
             const isSelected = answers.includes(idx);
             let classes = 'option', icon = '';
             if (isChecked) {
@@ -759,34 +799,95 @@
                 else if (!opt.correct && isSelected) { classes += ' incorrect'; icon = '<span class="option-icon">✗</span>'; }
                 else if (opt.correct && !isSelected) { classes += ' missed'; icon = '<span class="option-icon">⚠</span>'; }
             } else if (isSelected) { classes += ' selected'; }
-            return `<label class="${classes}" onclick="selectOption(${q.id}, ${idx}, ${isMultiple})">
-                <input type="${isMultiple ? 'checkbox' : 'radio'}" name="q${q.id}" ${isSelected ? 'checked' : ''} ${isChecked ? 'disabled' : ''}>
+            return `<label class="${classes}" data-qid="${q.id}" data-idx="${idx}" onclick="selectOption(${q.id}, ${idx})">
+                <input type="checkbox" name="q${q.id}" ${isSelected ? 'checked' : ''} ${isChecked ? 'disabled' : ''}>
                 <span class="option-text">${opt.text}</span>${icon}
             </label>`;
         }
         
-        function selectOption(qId, optIdx, multiple) {
+        function selectOption(qId, optIdx) {
             if (checkedQuestions.has(qId)) return;
             if (!userAnswers[qId]) userAnswers[qId] = [];
-            if (multiple) {
-                const idx = userAnswers[qId].indexOf(optIdx);
-                if (idx > -1) userAnswers[qId].splice(idx, 1);
-                else userAnswers[qId].push(optIdx);
-            } else { userAnswers[qId] = [optIdx]; }
+            const idx = userAnswers[qId].indexOf(optIdx);
+            if (idx > -1) userAnswers[qId].splice(idx, 1);
+            else userAnswers[qId].push(optIdx);
             saveProgress();
-            renderQuestions();
+            // Update UI in-place instead of full re-render (preserves KaTeX)
+            updateOptionStates(qId);
+        }
+        
+        function updateOptionStates(qId) {
+            const container = document.getElementById('options-' + qId);
+            if (!container) return;
+            const answers = userAnswers[qId] || [];
+            const labels = container.querySelectorAll('label[data-qid="' + qId + '"]');
+            labels.forEach(label => {
+                const optIdx = parseInt(label.getAttribute('data-idx'));
+                const isSelected = answers.includes(optIdx);
+                const checkbox = label.querySelector('input');
+                if (checkbox) checkbox.checked = isSelected;
+                label.classList.toggle('selected', isSelected);
+            });
         }
         
         function toggleBookmark(qId) {
             if (bookmarks.has(qId)) bookmarks.delete(qId);
             else bookmarks.add(qId);
             saveProgress();
-            renderQuestions();
+            // Update bookmark icon in-place
+            const card = document.getElementById('question-' + qId);
+            if (card) {
+                const btn = card.querySelector('.bookmark-btn');
+                if (btn) btn.textContent = bookmarks.has(qId) ? '⭐' : '☆';
+                card.classList.toggle('bookmarked', bookmarks.has(qId));
+            }
         }
         
         // === CHECKING ===
-        function checkQuestion(qId) { checkedQuestions.add(qId); saveProgress(); updateStats(); renderQuestions(); }
-        function checkAllAnswers() { displayQuestions.forEach(q => { if (userAnswers[q.id]?.length > 0) checkedQuestions.add(q.id); }); saveProgress(); updateStats(); renderQuestions(); }
+        function checkQuestion(qId) {
+            checkedQuestions.add(qId);
+            saveProgress();
+            updateStats();
+            // Update the question card in-place to show results (preserves KaTeX)
+            const q = questions.find(q => q.id === qId) || displayQuestions.find(q => q.id === qId);
+            if (!q) { renderQuestions(); return; }
+            const container = document.getElementById('options-' + qId);
+            if (!container) { renderQuestions(); return; }
+            const answers = userAnswers[qId] || [];
+            const labels = container.querySelectorAll('label[data-qid="' + qId + '"]');
+            labels.forEach(label => {
+                const optIdx = parseInt(label.getAttribute('data-idx'));
+                const opt = q.options[optIdx];
+                const isSelected = answers.includes(optIdx);
+                const checkbox = label.querySelector('input');
+                if (checkbox) checkbox.disabled = true;
+                label.classList.remove('selected');
+                // Remove old icons
+                const oldIcon = label.querySelector('.option-icon');
+                if (oldIcon) oldIcon.remove();
+                if (opt.correct && isSelected) {
+                    label.className = 'option correct';
+                    label.insertAdjacentHTML('beforeend', '<span class="option-icon">✓</span>');
+                } else if (!opt.correct && isSelected) {
+                    label.className = 'option incorrect';
+                    label.insertAdjacentHTML('beforeend', '<span class="option-icon">✗</span>');
+                } else if (opt.correct && !isSelected) {
+                    label.className = 'option missed';
+                    label.insertAdjacentHTML('beforeend', '<span class="option-icon">⚠</span>');
+                } else {
+                    label.className = 'option';
+                }
+            });
+            const btn = document.getElementById('checkbtn-' + qId);
+            if (btn) { btn.disabled = true; btn.innerHTML = '✓ Sprawdzono'; }
+        }
+        function checkAllAnswers() {
+            displayQuestions.forEach(q => { if (userAnswers[q.id]?.length > 0) checkedQuestions.add(q.id); });
+            saveProgress();
+            updateStats();
+            // Re-render fully for check-all since many cards changed
+            renderQuestions();
+        }
         
         function isQuestionCorrect(q) {
             const answers = userAnswers[q.id] || [];
@@ -821,6 +922,13 @@
         
         function filterQuestions() { currentSearch = document.getElementById('searchBox').value; currentPage = 1; renderQuestions(); }
         function shuffleQuestions() { displayQuestions.sort(() => Math.random() - 0.5); currentPage = 1; renderQuestions(); }
+        function toggleAutoShuffle() {
+            autoShuffle = !autoShuffle;
+            const btn = document.getElementById('autoShuffleBtn');
+            if (btn) btn.textContent = autoShuffle ? '🔀 Auto-losuj: WŁ' : '🔀 Auto-losuj: WYŁ';
+            if (autoShuffle) shuffleQuestions();
+            localStorage.setItem('dyskretna_autoshuffle', autoShuffle ? '1' : '0');
+        }
         function prevPage() { if (currentPage > 1) { currentPage--; renderQuestions(); window.scrollTo(0, 0); } }
         function nextPage() { const totalPages = Math.ceil(getFilteredQuestions().length / questionsPerPage); if (currentPage < totalPages) { currentPage++; renderQuestions(); window.scrollTo(0, 0); } }
         
@@ -926,7 +1034,17 @@
                 document.getElementById('themeIcon').textContent = '☀️';
                 document.getElementById('themeText').textContent = 'Jasny';
             }
-            setTimeout(init, 300);
+            if (localStorage.getItem('dyskretna_autoshuffle') === '1') {
+                autoShuffle = true;
+            }
+            setTimeout(() => {
+                init();
+                if (autoShuffle) {
+                    const btn = document.getElementById('autoShuffleBtn');
+                    if (btn) btn.textContent = '🔀 Auto-losuj: WŁ';
+                    shuffleQuestions();
+                }
+            }, 300);
         });
     </script>
 </body>
